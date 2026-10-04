@@ -88,7 +88,7 @@ The basic Home view is the network map.
 
 The Advanced dashboard keeps the cards that matter on a booster.
 
-- Broadband shows the connection as Wi-Fi Backhaul.
+- Broadband is not shown.
 - Internet Access shows the upstream network, signal, and rate.
 - Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The scan list is titled Available Networks, and its columns line up with Current Backhaul.
 - Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.

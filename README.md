@@ -44,7 +44,7 @@ Running `./wifi-backhaul` again keeps an upstream network and a backhaul address
 ./wifi-backhaul -U -y
 ```
 
-This downloads the latest installer and applies it. The upstream Wi-Fi, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. It does not reboot, and the backhaul link stays up. Refresh the browser when it finishes.
+This downloads the latest installer and applies it. The upstream Wi-Fi, the saved radio lock, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. It does not reboot, and the backhaul link stays up. Refresh the browser when it finishes.
 
 The first time this command is used, download the installer and then update:
 
@@ -90,7 +90,7 @@ The Advanced dashboard keeps the cards that matter on a booster.
 
 - Broadband is not shown.
 - Internet Access shows the upstream network, signal, and rate.
-- Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The scan list is titled Available Networks, and its columns line up with Current Backhaul.
+- Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The scan list is titled Available Networks, and its columns line up with Current Backhaul. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
 - Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.
 - Local Network shows this booster's address, the backhaul address, and the gateway.
 - USB Backup is the USB backup and restore page described below.

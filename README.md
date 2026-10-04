@@ -24,6 +24,8 @@ chmod +x wifi-backhaul
 
 The installer keeps the address `pre-booster` already set, restarts services, and does not reboot.
 
+Once the script has run, remove the WAN connection. Sign in through a LAN port or the booster's Wi-Fi, then open the new address, such as `http://192.168.100.4/`.
+
 ## Fresh setup
 
 `192.168.19.254` in older notes was only an example. Use the address for the network you are actually on.
@@ -53,9 +55,11 @@ chmod +x wifi-backhaul
 
 When it finishes:
 
-1. Open `http://192.168.100.4/`
-2. Open the Wi-Fi Backhaul card and choose the main modem's Wi-Fi.
-3. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
+1. Remove the WAN connection.
+2. Sign in through a LAN port or the booster's Wi-Fi.
+3. Open the new address, `http://192.168.100.4/`.
+4. Open the Wi-Fi Backhaul card and choose the main modem's Wi-Fi.
+5. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
 

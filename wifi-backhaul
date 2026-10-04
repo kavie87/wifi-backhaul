@@ -19685,6 +19685,7 @@ else
   echo "  A saved upstream network on this device is kept."
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
   echo "Open http://$LAN_IP/ when it finishes."
+  echo "Remove the WAN connection. Sign in through a LAN port or Wi-Fi, then use that address."
 fi
 if [ "$YES" != y ]; then
   echo -n "Enter y to continue: "
@@ -19786,6 +19787,7 @@ if [ "$UPDATE" = y ]; then
 else
   echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
   echo "Browse to http://$LAN_IP/ and refresh the page."
+  echo "Remove the WAN connection. Sign in through a LAN port or Wi-Fi, then use that address."
   if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."
   fi

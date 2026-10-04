@@ -32,7 +32,7 @@ Example:
   ./$SCRIPT -i 192.168.100.4 -y
 
 After the page loads at that address, run:
-  ./wifi-backhaul -i 192.168.100.4 -y
+  ./wifi-backhaul -y
 EOH
 exit 1
 }
@@ -70,7 +70,7 @@ echo -e "${GREEN}This moves the modem LAN address.${NC}"
 echo "  From: ${old_lan:-unknown}"
 echo "  To:   $LAN_IP"
 echo -e "${ORANGE}The network restarts. The modem stays up. DHCP stays on.${NC}"
-echo "Open http://$LAN_IP/ when it finishes, then run ./wifi-backhaul -i $LAN_IP -y"
+echo "Open http://$LAN_IP/ when it finishes, then run ./wifi-backhaul -y"
 
 if [ "$old_lan" = "$LAN_IP" ]; then
   echo -e "${GREEN}This modem is already at $LAN_IP.${NC}"
@@ -93,4 +93,4 @@ echo "Restarting the network. The modem stays up."
 /etc/init.d/dnsmasq restart
 echo -e "${GREEN}LAN address is $LAN_IP.${NC}"
 echo "Open http://$LAN_IP/ and confirm the page loads."
-echo "Then run: ./wifi-backhaul -i $LAN_IP -y"
+echo "Then run: ./wifi-backhaul -y"

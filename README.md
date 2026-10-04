@@ -19,10 +19,10 @@ Open `http://192.168.100.4/` and confirm the page loads. Then install:
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
-./wifi-backhaul -i 192.168.100.4 -y
+./wifi-backhaul -y
 ```
 
-`-i` is the address you just set. The installer keeps that address, restarts services, and does not reboot.
+The installer keeps the address `pre-booster` already set, restarts services, and does not reboot.
 
 ## Fresh setup
 
@@ -43,7 +43,7 @@ Open `http://192.168.100.4/` and confirm the page loads. Then:
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
-./wifi-backhaul -i 192.168.100.4 -y
+./wifi-backhaul -y
 ```
 
 When it finishes:
@@ -144,12 +144,12 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 ## Installer options
 
 ```text
-./wifi-backhaul -i 192.168.100.4 -y
+./wifi-backhaul -y
 ```
 
 | Option | Effect |
 | --- | --- |
-| `-i` | This booster's LAN address. Set it first with `pre-booster` |
+| `-i` | Not required. `pre-booster` has already set the address |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |

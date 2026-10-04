@@ -3,9 +3,9 @@
 # de-telstra'd, and running tch-gui-unhide.
 #
 #   chmod +x wifi-backhaul
-#   ./wifi-backhaul -i 192.168.100.2 -y
+#   ./wifi-backhaul -y
 #
-# -i is the booster's own LAN address (the address you browse to).
+# The LAN address is the one already set by pre-booster.
 # The upstream Wi-Fi name and password are not stored in this file.
 # After it finishes, choose the upstream network in the Wi-Fi Backhaul card.
 # ./tch-gui-unhide -U -y keeps these pages. Run ./wifi-backhaul -U -y
@@ -23,27 +23,28 @@ usage() {
 cat <<EOH
 Installs or updates the Wi-Fi backhaul booster on this device.
 
-Usage: ./$SCRIPT -i <lan-ip> [-y] [-n]
+Usage: ./$SCRIPT [-y]
        ./$SCRIPT -U [-y]
 
 Options:
- -i <lan-ip>  IPv4 address of this booster on the main modem's LAN
  -U           Update an existing booster and keep its saved settings
  -y           Skip the confirmation prompt
  -n           Accepted. The install does not reboot anyway
  -t           Check the packaged files, then exit
 
 Example:
-  ./$SCRIPT -i 192.168.100.2 -y
+  ./$SCRIPT -y
   ./$SCRIPT -U -y
+
+The LAN address is the one already set by pre-booster. This installer
+keeps that address.
 
 -U downloads the latest installer, then applies it. The upstream Wi-Fi,
 the backhaul address, and this booster's LAN address stay as they are.
 It does not reboot. Refresh the browser when it finishes.
 
-Run a new install after reset-to-factory-defaults-with-root, de-telstra,
-and tch-gui-unhide. The LAN address can be any address on that network.
-192.168.100.2 is the address used on a 192.168.100.0 network.
+Run pre-booster after reset-to-factory-defaults-with-root, de-telstra,
+and tch-gui-unhide. Then run this installer.
 EOH
 exit 1
 }
@@ -141,10 +142,6 @@ if [ "$UPDATE" = y ]; then
   REBOOT=n
 fi
 
-if [ "$TEST" != y ] && [ "$UPDATE" != y ] && [ -z "$LAN_IP" ]; then
-  echo -e "${RED}The booster LAN address is required. Example: -i 192.168.100.2${NC}"
-  usage
-fi
 if [ -n "$LAN_IP" ] && ! valid_ipv4 "$LAN_IP"; then
   echo -e "${RED}Invalid LAN address: $LAN_IP${NC}"
   exit 1
@@ -183,12 +180,12 @@ if [ "$UPDATE" = y ] && [ "$WIFI_BACKHAUL_FETCHED" != 1 ] && [ "$TEST" != y ]; t
   fi
 fi
 
-if [ "$UPDATE" = y ] && [ -z "$LAN_IP" ]; then
+if [ -z "$LAN_IP" ]; then
   LAN_IP=$(uci -q get network.lan.ipaddr)
 fi
-if [ "$TEST" != y ] && [ -z "$LAN_IP" ]; then
-  echo -e "${RED}The booster LAN address is required. Example: -i 192.168.100.2${NC}"
-  usage
+if [ "$TEST" != y ] && { [ -z "$LAN_IP" ] || ! valid_ipv4 "$LAN_IP"; }; then
+  echo -e "${RED}This modem has no LAN address yet. Run ./pre-booster first.${NC}"
+  exit 1
 fi
 
 tmp=/tmp/wifi-backhaul-unpack.$$
@@ -19683,6 +19680,7 @@ if [ "$UPDATE" = y ]; then
 else
   echo -e "${GREEN}This installs the Wi-Fi backhaul booster.${NC}"
   echo "  LAN address: $LAN_IP"
+  echo "  That address is already set and is kept."
   echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
   echo "  A saved upstream network on this device is kept."
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"

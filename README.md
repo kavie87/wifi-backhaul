@@ -92,7 +92,7 @@ The Advanced dashboard keeps the cards that matter on a booster.
 - Internet Access shows the upstream network, signal, and rate.
 - Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The scan list is titled Available Networks, and its columns line up with Current Backhaul. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
 - Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.
-- Local Network shows this booster's address, the backhaul address, and the gateway.
+- Local Network shows this booster's address, and the backhaul address and gateway while the backhaul link is up.
 - USB Backup is the USB backup and restore page described below.
 - Management is where card names are shown and cards are switched on or off. The backup card is labelled USB.
 - Diagnostics no longer has a TCP Dump tab.

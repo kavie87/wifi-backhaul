@@ -1,5 +1,6 @@
 #!/bin/sh
-# Move this modem onto the main modem's LAN before the Wi-Fi backhaul install.
+# Move the booster modem onto the same network as the main modem.
+# Check that the LAN address is free before using it.
 # It restarts the network and DHCP. It does not reboot, and it does not turn
 # DHCP off. Confirm the page loads, then run wifi-backhaul with the same address.
 #
@@ -14,7 +15,8 @@ NC='\033[0m'
 
 usage() {
 cat <<EOH
-Moves this modem's LAN address before the Wi-Fi backhaul install.
+Moves the booster modem onto the same network as the main modem.
+Check that the LAN address is free before you use it.
 
 Usage: ./$SCRIPT -i <lan-ip> [-y]
 
@@ -22,8 +24,8 @@ Options:
  -i <lan-ip>  IPv4 address for this modem on the main modem's LAN
  -y           Skip the confirmation prompt
 
-Pick a free address. On a 192.168.100.0 network the main modem is
-192.168.100.1, so this modem needs a different address.
+Check that the LAN address is free. On a 192.168.100.0 network the main
+modem is 192.168.100.1, so this booster needs another free address.
 
 This restarts the network and DHCP. It does not reboot. DHCP stays on
 so a computer can pick up an address on the new network.

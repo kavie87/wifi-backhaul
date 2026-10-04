@@ -6,7 +6,7 @@ The upstream network name and password are not in this download. After the boost
 
 ## Download and install
 
-Run `pre-booster` first. It moves this modem onto the main modem's LAN. Pick a free address on that network. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this modem needs a different address, such as `192.168.100.4`. This does not reboot.
+Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. This does not reboot.
 
 ```sh
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
@@ -33,6 +33,11 @@ The installer keeps the address `pre-booster` already set, restarts services, an
 curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s -- -g
 ./de-telstra -S -M -ma -h DJA0231-Booster -d DJA0231-Booster -y
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
+```
+
+Move the booster modem onto the same network as the main modem. Check that the LAN address is free first.
+
+```sh
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
 chmod +x pre-booster
 ./pre-booster -i 192.168.100.4 -y

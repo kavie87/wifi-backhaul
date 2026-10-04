@@ -22,7 +22,7 @@ chmod +x wifi-backhaul
 ./wifi-backhaul -y
 ```
 
-The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns the WAN port into a LAN port and removes the unused service cards.
+The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns the WAN port into a LAN port and removes the unused service cards. DHCP stays on until a Wi-Fi backhaul connects, then it turns off.
 
 Once the script has run, disconnect this booster from the internet connection. The WAN port is now a LAN port. Connect to this booster's Wi-Fi, open the new address, such as `http://192.168.100.4/`, and from there connect the Wi-Fi backhaul.
 

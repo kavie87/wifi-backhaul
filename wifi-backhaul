@@ -19747,8 +19747,8 @@ else
   echo "  A saved upstream network on this device is kept."
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
   echo "Open http://$LAN_IP/ when it finishes."
-  echo "Disconnect this booster from the internet connection. The WAN port is now a LAN port."
-  echo "It then uses a small subnet and gives out one address."
+  echo "Remove the WAN connection now. The WAN port is now a LAN port."
+  echo "It then uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi."
   echo "Connect to this booster's Wi-Fi, renew that address, then connect the Wi-Fi backhaul."
 fi
 if [ "$YES" != y ]; then
@@ -19825,6 +19825,7 @@ if [ "$UPDATE" != y ]; then
       pool=$((base + 1))
     fi
     dhcp_start=$((pool - base))
+    dhcp_limit=1
   else
     applied_mask=255.255.255.248
     rem8=$((o % 8))
@@ -19834,13 +19835,18 @@ if [ "$UPDATE" != y ]; then
       pool=$((base + 1))
     fi
     dhcp_start=$((pool - base))
+    dhcp_limit=1
+    second=$((base + dhcp_start + 1))
+    if [ "$second" -le $((base + 6)) ] && [ "$second" -ne "$o" ]; then
+      dhcp_limit=2
+    fi
   fi
   printf '%s\n' "$applied_mask" > /root/dja-backhaul/waiting-netmask
-  printf '%s %s\n' "$dhcp_start" 1 > /root/dja-backhaul/waiting-dhcp
+  printf '%s %s\n' "$dhcp_start" "$dhcp_limit" > /root/dja-backhaul/waiting-dhcp
   uci set dhcp.lan.ignore='0'
   uci set dhcp.lan.dhcpv4='server'
   uci set dhcp.lan.start="$dhcp_start"
-  uci set dhcp.lan.limit='1'
+  uci set dhcp.lan.limit="$dhcp_limit"
   uci commit dhcp
 fi
 uci set network.lan.netmask="$applied_mask"
@@ -19890,8 +19896,8 @@ if [ "$UPDATE" = y ]; then
 else
   echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
   echo "Browse to http://$LAN_IP/ and refresh the page."
-  echo "Disconnect this booster from the internet connection. The WAN port is now a LAN port."
-  echo "It is on a small subnet and gives out one address. Renew the computer address."
+  echo "Remove the WAN connection now. The WAN port is now a LAN port."
+  echo "It gives out two addresses, one for a LAN port and one for Wi-Fi. Renew the computer address."
   echo "Open http://$LAN_IP/ and connect the Wi-Fi backhaul."
   if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."

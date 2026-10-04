@@ -6,33 +6,55 @@ The upstream network name and password are not in this download. After the boost
 
 ## Download and install
 
-Run this on the booster, after root, de-telstra, and tch-gui-unhide:
+Move this booster onto the main modem's LAN before running the installer. Pick a free address on that network. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs a different address, such as `192.168.100.4`. This does not reboot.
+
+```sh
+uci set network.lan.proto='static'
+uci set network.lan.ipaddr='192.168.100.4'
+uci set network.lan.netmask='255.255.255.0'
+uci commit network
+/etc/init.d/network reload
+/etc/init.d/dnsmasq restart
+```
+
+Open `http://192.168.100.4/` and confirm the page loads. Then install:
 
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
-./wifi-backhaul -i 192.168.100.2 -y
+./wifi-backhaul -i 192.168.100.4 -y
 ```
 
-`-i` is this booster's own address, the one you type in a browser. `192.168.100.2` is the address on a `192.168.100.0` network. On another network, pass that network's address instead. The script restarts services and does not reboot. Open the new address when it finishes.
+`-i` is the address you just set. The installer keeps that address, restarts services, and does not reboot.
 
 ## Fresh setup
 
 `192.168.19.254` in older notes was only an example. Use the address for the network you are actually on.
 
 ```sh
-./reset-to-factory-defaults-with-root -I 192.168.100.2 -c
+./reset-to-factory-defaults-with-root -c
 curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s -- -g
 ./de-telstra -S -M -ma -h DJA0231-Booster -d DJA0231-Booster -y
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
+uci set network.lan.proto='static'
+uci set network.lan.ipaddr='192.168.100.4'
+uci set network.lan.netmask='255.255.255.0'
+uci commit network
+/etc/init.d/network reload
+/etc/init.d/dnsmasq restart
+```
+
+Open `http://192.168.100.4/` and confirm the page loads. Then:
+
+```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
-./wifi-backhaul -i 192.168.100.2 -y
+./wifi-backhaul -i 192.168.100.4 -y
 ```
 
 When it finishes:
 
-1. Open `http://192.168.100.2/`
+1. Open `http://192.168.100.4/`
 2. Open the Wi-Fi Backhaul card and choose the main modem's Wi-Fi.
 3. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
 
@@ -128,7 +150,7 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 ## Installer options
 
 ```text
-./wifi-backhaul -i 192.168.100.2 -y
+./wifi-backhaul -i 192.168.100.4 -y
 ```
 
 | Option | Effect |

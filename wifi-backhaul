@@ -19738,6 +19738,7 @@ if [ -x /root/dja-backhaul/rfkill-button.sh ]; then
   chmod 755 /etc/rc.button/rfkill
 fi
 
+old_lan=$(uci -q get network.lan.ipaddr)
 uci set network.lan.proto='static'
 uci set network.lan.ipaddr="$LAN_IP"
 uci set network.lan.netmask='255.255.255.0'
@@ -19795,5 +19796,7 @@ else
   /etc/init.d/hostapd reload >/dev/null 2>&1 || true
   nginx -s reload >/dev/null 2>&1 || true
   /etc/init.d/dja-backhaul start >/dev/null 2>&1 || true
-  /etc/init.d/network reload >/dev/null 2>&1 || true
+  if [ "$old_lan" != "$LAN_IP" ]; then
+    /etc/init.d/network reload >/dev/null 2>&1 || true
+  fi
 fi

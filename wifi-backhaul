@@ -8,8 +8,10 @@
 # -i is the booster's own LAN address (the address you browse to).
 # The upstream Wi-Fi name and password are not stored in this file.
 # After it boots, choose the upstream network in the Wi-Fi Backhaul card.
-# ./tch-gui-unhide -U -y keeps these pages. Run this installer again
-# if you replace /root/tch-gui-unhide itself.
+# ./tch-gui-unhide -U -y keeps these pages. Run ./wifi-backhaul -U -y
+# to apply a newer copy of this installer without changing the saved
+# upstream Wi-Fi, backhaul address, or this booster's LAN address.
+# Run the full install again if you replace /root/tch-gui-unhide itself.
 
 SCRIPT="$(basename "$0")"
 GREEN='\033[1;32m'
@@ -19,21 +21,28 @@ NC='\033[0m'
 
 usage() {
 cat <<EOH
-Installs the Wi-Fi backhaul booster on this device.
+Installs or updates the Wi-Fi backhaul booster on this device.
 
 Usage: ./$SCRIPT -i <lan-ip> [-y] [-n]
+       ./$SCRIPT -U [-y]
 
 Options:
  -i <lan-ip>  IPv4 address of this booster on the main modem's LAN
+ -U           Update an existing booster and keep its saved settings
  -y           Skip the confirmation prompt
  -n           Do not reboot when finished
  -t           Check the packaged files, then exit
 
 Example:
   ./$SCRIPT -i 192.168.100.2 -y
+  ./$SCRIPT -U -y
 
-Run this after reset-to-factory-defaults-with-root, de-telstra, and
-tch-gui-unhide. The LAN address can be any address on that network.
+-U downloads the latest installer, then applies it. The upstream Wi-Fi,
+the backhaul address, and this booster's LAN address stay as they are.
+It does not reboot. Refresh the browser when it finishes.
+
+Run a new install after reset-to-factory-defaults-with-root, de-telstra,
+and tch-gui-unhide. The LAN address can be any address on that network.
 192.168.100.2 is the address used on a 192.168.100.0 network.
 EOH
 exit 1
@@ -116,17 +125,23 @@ LAN_IP=
 YES=n
 REBOOT=y
 TEST=n
-while getopts :i:nyt option; do
+UPDATE=n
+while getopts :i:nytU option; do
   case "$option" in
     i) LAN_IP=$OPTARG ;;
     n) REBOOT=n ;;
     y) YES=y ;;
     t) TEST=y ;;
+    U) UPDATE=y ;;
     *) usage ;;
   esac
 done
 
-if [ "$TEST" != y ] && [ -z "$LAN_IP" ]; then
+if [ "$UPDATE" = y ]; then
+  REBOOT=n
+fi
+
+if [ "$TEST" != y ] && [ "$UPDATE" != y ] && [ -z "$LAN_IP" ]; then
   echo -e "${RED}The booster LAN address is required. Example: -i 192.168.100.2${NC}"
   usage
 fi
@@ -137,6 +152,43 @@ fi
 if [ "$(id -u)" != 0 ]; then
   echo -e "${RED}Run this as root on the booster.${NC}"
   exit 1
+fi
+
+if [ "$UPDATE" = y ] && [ "$WIFI_BACKHAUL_FETCHED" != 1 ] && [ "$TEST" != y ]; then
+  dest=/tmp/wifi-backhaul.update
+  url=https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
+  echo "Downloading the latest installer."
+  rm -f "$dest"
+  if curl -skL --max-time 90 -o "$dest" "$url" \
+    && [ -s "$dest" ] \
+    && head -n 1 "$dest" | grep -q '^#!/bin/sh' \
+    && grep -q WIFI_BACKHAUL_FETCHED "$dest"; then
+    chmod 755 "$dest"
+    if cmp -s "$dest" "$0" 2>/dev/null; then
+      echo "This installer is already the latest."
+    else
+      echo "Applying the downloaded installer."
+      WIFI_BACKHAUL_FETCHED=1
+      export WIFI_BACKHAUL_FETCHED
+      set -- -U
+      [ "$YES" = y ] && set -- "$@" -y
+      [ -n "$LAN_IP" ] && set -- "$@" -i "$LAN_IP"
+      exec "$dest" "$@"
+      echo -e "${RED}Could not start the downloaded installer.${NC}"
+      exit 1
+    fi
+  else
+    echo -e "${ORANGE}Could not download a newer installer. Applying this copy.${NC}"
+    rm -f "$dest"
+  fi
+fi
+
+if [ "$UPDATE" = y ] && [ -z "$LAN_IP" ]; then
+  LAN_IP=$(uci -q get network.lan.ipaddr)
+fi
+if [ "$TEST" != y ] && [ -z "$LAN_IP" ]; then
+  echo -e "${RED}The booster LAN address is required. Example: -i 192.168.100.2${NC}"
+  usage
 fi
 
 tmp=/tmp/wifi-backhaul-unpack.$$
@@ -19621,14 +19673,22 @@ if [ "$TEST" = y ]; then
   exit 0
 fi
 
-echo -e "${GREEN}This installs the Wi-Fi backhaul booster.${NC}"
-echo "  LAN address: $LAN_IP"
-echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
-echo "  A saved upstream network on this device is kept."
-if [ "$REBOOT" = y ]; then
-  echo -e "${ORANGE}The booster will reboot at the end.${NC}"
+if [ "$UPDATE" = y ]; then
+  echo -e "${GREEN}This updates the Wi-Fi backhaul booster.${NC}"
+  echo "  LAN address: $LAN_IP"
+  echo "  Saved upstream Wi-Fi and the backhaul address are kept."
+  echo -e "${ORANGE}It will not reboot, and the backhaul link stays up.${NC}"
+  echo "Refresh the browser when this finishes."
 else
-  echo -e "${ORANGE}It will not reboot. Reboot it yourself before using the new address.${NC}"
+  echo -e "${GREEN}This installs the Wi-Fi backhaul booster.${NC}"
+  echo "  LAN address: $LAN_IP"
+  echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
+  echo "  A saved upstream network on this device is kept."
+  if [ "$REBOOT" = y ]; then
+    echo -e "${ORANGE}The booster will reboot at the end.${NC}"
+  else
+    echo -e "${ORANGE}It will not reboot. Reboot it yourself before using the new address.${NC}"
+  fi
 fi
 if [ "$YES" != y ]; then
   echo -n "Enter y to continue: "
@@ -19711,14 +19771,29 @@ fi
 install_wrapper
 /root/dja-backhaul/restore-webui.sh --once || true
 
+if [ -f "$0" ]; then
+  cp "$0" /root/wifi-backhaul
+  chmod 755 /root/wifi-backhaul
+fi
+
 rm -rf "$tmp"
 sync
-echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
-echo "Browse to http://$LAN_IP/ after it finishes starting."
-if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
-  echo "Open the Wi-Fi Backhaul card and choose the upstream network."
-fi
-if [ "$REBOOT" = y ]; then
-  echo -e "${ORANGE}Rebooting.${NC}"
-  reboot
+if [ "$UPDATE" = y ]; then
+  pid=$(ps w | grep '/root/dja-backhaul/web-control.sh' | grep -v grep | awk '{print $1}')
+  if [ -n "$pid" ]; then
+    kill $pid 2>/dev/null || true
+  fi
+  echo -e "${GREEN}Wi-Fi backhaul is updated.${NC}"
+  echo "Browse to http://$LAN_IP/ and refresh the page."
+  echo "The upstream Wi-Fi and the backhaul address were kept."
+else
+  echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
+  echo "Browse to http://$LAN_IP/ after it finishes starting."
+  if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
+    echo "Open the Wi-Fi Backhaul card and choose the upstream network."
+  fi
+  if [ "$REBOOT" = y ]; then
+    echo -e "${ORANGE}Rebooting.${NC}"
+    reboot
+  fi
 fi

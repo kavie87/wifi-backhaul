@@ -38,13 +38,31 @@ When it comes back:
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
 
+## Update an existing booster
+
+```sh
+./wifi-backhaul -U -y
+```
+
+This downloads the latest installer and applies it. The upstream Wi-Fi, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. It does not reboot, and the backhaul link stays up. Refresh the browser when it finishes.
+
+The first time this command is used, download the installer and then update:
+
+```sh
+curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
+chmod +x wifi-backhaul
+./wifi-backhaul -U -y
+```
+
+After that, `/root/wifi-backhaul -U -y` downloads and applies a newer copy.
+
 ## Keeping the pages after an unhide upgrade
 
 ```sh
 ./tch-gui-unhide -U -y
 ```
 
-That upgrade rewrites the web pages, then puts the booster pages back. If you run the tch-gui-unhide `get` command again and it replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -i 192.168.100.2 -y` once more so later upgrades keep the pages.
+That upgrade rewrites the web pages, then puts the booster pages back. If you run the tch-gui-unhide `get` command again and it replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -U -y` once more so later upgrades keep the pages.
 
 ## What the booster does
 
@@ -116,6 +134,7 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 | Option | Effect |
 | --- | --- |
 | `-i` | This booster's LAN address |
+| `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-y` | Do not ask for confirmation |
 | `-n` | Do not reboot at the end |
 | `-t` | Check the packaged files and exit |

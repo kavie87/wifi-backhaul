@@ -7,7 +7,7 @@
 #
 # -i is the booster's own LAN address (the address you browse to).
 # The upstream Wi-Fi name and password are not stored in this file.
-# After it boots, choose the upstream network in the Wi-Fi Backhaul card.
+# After it finishes, choose the upstream network in the Wi-Fi Backhaul card.
 # ./tch-gui-unhide -U -y keeps these pages. Run ./wifi-backhaul -U -y
 # to apply a newer copy of this installer without changing the saved
 # upstream Wi-Fi, backhaul address, or this booster's LAN address.
@@ -30,7 +30,7 @@ Options:
  -i <lan-ip>  IPv4 address of this booster on the main modem's LAN
  -U           Update an existing booster and keep its saved settings
  -y           Skip the confirmation prompt
- -n           Do not reboot when finished
+ -n           Accepted. The install does not reboot anyway
  -t           Check the packaged files, then exit
 
 Example:
@@ -123,7 +123,7 @@ LUA
 
 LAN_IP=
 YES=n
-REBOOT=y
+REBOOT=n
 TEST=n
 UPDATE=n
 while getopts :i:nytU option; do
@@ -19685,11 +19685,8 @@ else
   echo "  LAN address: $LAN_IP"
   echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
   echo "  A saved upstream network on this device is kept."
-  if [ "$REBOOT" = y ]; then
-    echo -e "${ORANGE}The booster will reboot at the end.${NC}"
-  else
-    echo -e "${ORANGE}It will not reboot. Reboot it yourself before using the new address.${NC}"
-  fi
+  echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
+  echo "Open http://$LAN_IP/ when it finishes."
 fi
 if [ "$YES" != y ]; then
   echo -n "Enter y to continue: "
@@ -19789,12 +19786,14 @@ if [ "$UPDATE" = y ]; then
   echo "The upstream Wi-Fi and the backhaul address were kept."
 else
   echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
-  echo "Browse to http://$LAN_IP/ after it finishes starting."
+  echo "Browse to http://$LAN_IP/ and refresh the page."
   if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."
   fi
-  if [ "$REBOOT" = y ]; then
-    echo -e "${ORANGE}Rebooting.${NC}"
-    reboot
-  fi
+  echo "Restarting services. The modem stays up."
+  /etc/init.d/dnsmasq restart >/dev/null 2>&1 || true
+  /etc/init.d/hostapd reload >/dev/null 2>&1 || true
+  nginx -s reload >/dev/null 2>&1 || true
+  /etc/init.d/dja-backhaul start >/dev/null 2>&1 || true
+  /etc/init.d/network reload >/dev/null 2>&1 || true
 fi

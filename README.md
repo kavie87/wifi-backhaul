@@ -14,7 +14,7 @@ chmod +x wifi-backhaul
 ./wifi-backhaul -i 192.168.100.2 -y
 ```
 
-`-i` is this booster's own address, the one you type in a browser. `192.168.100.2` is the address on a `192.168.100.0` network. On another network, pass that network's address instead. The script reboots at the end. Add `-n` if you want to reboot yourself.
+`-i` is this booster's own address, the one you type in a browser. `192.168.100.2` is the address on a `192.168.100.0` network. On another network, pass that network's address instead. The script restarts services and does not reboot. Open the new address when it finishes.
 
 ## Fresh setup
 
@@ -30,7 +30,7 @@ chmod +x wifi-backhaul
 ./wifi-backhaul -i 192.168.100.2 -y
 ```
 
-When it comes back:
+When it finishes:
 
 1. Open `http://192.168.100.2/`
 2. Open the Wi-Fi Backhaul card and choose the main modem's Wi-Fi.
@@ -136,7 +136,7 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 | `-i` | This booster's LAN address |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-y` | Do not ask for confirmation |
-| `-n` | Do not reboot at the end |
+| `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
 
 ## Put the booster back

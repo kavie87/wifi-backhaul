@@ -19730,7 +19730,7 @@ else
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
   echo "Open http://$LAN_IP/ when it finishes."
   echo "Disconnect this booster from the internet connection. The WAN port is now a LAN port."
-  echo "Sign in through a LAN port or Wi-Fi, open that address, then connect the Wi-Fi backhaul."
+  echo "Connect to this booster's Wi-Fi, open that address, then connect the Wi-Fi backhaul."
 fi
 if [ "$YES" != y ]; then
   echo -n "Enter y to continue: "
@@ -19844,7 +19844,7 @@ else
   echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
   echo "Browse to http://$LAN_IP/ and refresh the page."
   echo "Disconnect this booster from the internet connection. The WAN port is now a LAN port."
-  echo "Sign in through a LAN port or Wi-Fi, open that address, then connect the Wi-Fi backhaul."
+  echo "Connect to this booster's Wi-Fi, open that address, then connect the Wi-Fi backhaul."
   if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."
   fi

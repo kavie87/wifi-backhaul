@@ -24,7 +24,7 @@ chmod +x wifi-backhaul
 
 The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns the WAN port into a LAN port and removes the unused service cards.
 
-Once the script has run, disconnect this booster from the internet connection. The WAN port is now a LAN port. Sign in through a LAN port or Wi-Fi, open the new address, such as `http://192.168.100.4/`, then connect the Wi-Fi backhaul.
+Once the script has run, disconnect this booster from the internet connection. The WAN port is now a LAN port. Connect to this booster's Wi-Fi, open the new address, such as `http://192.168.100.4/`, and from there connect the Wi-Fi backhaul.
 
 ## Fresh setup
 
@@ -56,9 +56,9 @@ chmod +x wifi-backhaul
 When it finishes:
 
 1. Disconnect this booster from the internet connection. The WAN port is now a LAN port.
-2. Sign in through a LAN port or Wi-Fi.
+2. Connect to this booster's Wi-Fi.
 3. Open the new address, `http://192.168.100.4/`.
-4. Open the Wi-Fi Backhaul card and connect the Wi-Fi backhaul.
+4. From that page, open the Wi-Fi Backhaul card and connect the Wi-Fi backhaul.
 5. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.

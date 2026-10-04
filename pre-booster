@@ -1,0 +1,96 @@
+#!/bin/sh
+# Move this modem onto the main modem's LAN before the Wi-Fi backhaul install.
+# It restarts the network and DHCP. It does not reboot, and it does not turn
+# DHCP off. Confirm the page loads, then run wifi-backhaul with the same address.
+#
+#   chmod +x pre-booster
+#   ./pre-booster -i 192.168.100.4 -y
+
+SCRIPT="$(basename "$0")"
+GREEN='\033[1;32m'
+ORANGE='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+usage() {
+cat <<EOH
+Moves this modem's LAN address before the Wi-Fi backhaul install.
+
+Usage: ./$SCRIPT -i <lan-ip> [-y]
+
+Options:
+ -i <lan-ip>  IPv4 address for this modem on the main modem's LAN
+ -y           Skip the confirmation prompt
+
+Pick a free address. On a 192.168.100.0 network the main modem is
+192.168.100.1, so this modem needs a different address.
+
+This restarts the network and DHCP. It does not reboot. DHCP stays on
+so a computer can pick up an address on the new network.
+
+Example:
+  ./$SCRIPT -i 192.168.100.4 -y
+
+After the page loads at that address, run:
+  ./wifi-backhaul -i 192.168.100.4 -y
+EOH
+exit 1
+}
+
+valid_ipv4() {
+  echo "$1" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' || return 1
+  old_ifs=$IFS
+  IFS=.
+  set -- $1
+  IFS=$old_ifs
+  [ $# -eq 4 ] || return 1
+  for part in "$1" "$2" "$3" "$4"; do
+    [ "$part" -ge 0 ] 2>/dev/null && [ "$part" -le 255 ] || return 1
+  done
+  return 0
+}
+
+LAN_IP=
+YES=n
+while getopts :i:y option; do
+  case "$option" in
+    i) LAN_IP=$OPTARG ;;
+    y) YES=y ;;
+    *) usage ;;
+  esac
+done
+
+if [ -z "$LAN_IP" ] || ! valid_ipv4 "$LAN_IP"; then
+  echo -e "${RED}A valid LAN address is required. Example: -i 192.168.100.4${NC}"
+  usage
+fi
+
+old_lan=$(uci -q get network.lan.ipaddr)
+echo -e "${GREEN}This moves the modem LAN address.${NC}"
+echo "  From: ${old_lan:-unknown}"
+echo "  To:   $LAN_IP"
+echo -e "${ORANGE}The network restarts. The modem stays up. DHCP stays on.${NC}"
+echo "Open http://$LAN_IP/ when it finishes, then run ./wifi-backhaul -i $LAN_IP -y"
+
+if [ "$old_lan" = "$LAN_IP" ]; then
+  echo -e "${GREEN}This modem is already at $LAN_IP.${NC}"
+  echo "Open http://$LAN_IP/ and then run the Wi-Fi backhaul installer."
+  exit 0
+fi
+
+if [ "$YES" != y ]; then
+  echo -n "Enter y to continue: "
+  read REPLY
+  [ "$REPLY" = y ] || [ "$REPLY" = Y ] || exit 0
+fi
+
+uci set network.lan.proto='static'
+uci set network.lan.ipaddr="$LAN_IP"
+uci set network.lan.netmask='255.255.255.0'
+uci commit network
+echo "Restarting the network. The modem stays up."
+/etc/init.d/network reload
+/etc/init.d/dnsmasq restart
+echo -e "${GREEN}LAN address is $LAN_IP.${NC}"
+echo "Open http://$LAN_IP/ and confirm the page loads."
+echo "Then run: ./wifi-backhaul -i $LAN_IP -y"

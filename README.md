@@ -6,15 +6,12 @@ The upstream network name and password are not in this download. After the boost
 
 ## Download and install
 
-Move this booster onto the main modem's LAN before running the installer. Pick a free address on that network. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs a different address, such as `192.168.100.4`. This does not reboot.
+Run `pre-booster` first. It moves this modem onto the main modem's LAN. Pick a free address on that network. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this modem needs a different address, such as `192.168.100.4`. This does not reboot.
 
 ```sh
-uci set network.lan.proto='static'
-uci set network.lan.ipaddr='192.168.100.4'
-uci set network.lan.netmask='255.255.255.0'
-uci commit network
-/etc/init.d/network reload
-/etc/init.d/dnsmasq restart
+curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
+chmod +x pre-booster
+./pre-booster -i 192.168.100.4 -y
 ```
 
 Open `http://192.168.100.4/` and confirm the page loads. Then install:
@@ -36,12 +33,9 @@ chmod +x wifi-backhaul
 curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s -- -g
 ./de-telstra -S -M -ma -h DJA0231-Booster -d DJA0231-Booster -y
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
-uci set network.lan.proto='static'
-uci set network.lan.ipaddr='192.168.100.4'
-uci set network.lan.netmask='255.255.255.0'
-uci commit network
-/etc/init.d/network reload
-/etc/init.d/dnsmasq restart
+curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
+chmod +x pre-booster
+./pre-booster -i 192.168.100.4 -y
 ```
 
 Open `http://192.168.100.4/` and confirm the page loads. Then:
@@ -155,7 +149,7 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 
 | Option | Effect |
 | --- | --- |
-| `-i` | This booster's LAN address |
+| `-i` | This booster's LAN address. Set it first with `pre-booster` |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |

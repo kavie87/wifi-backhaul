@@ -1,0 +1,315 @@
+#!/bin/sh
+# Put this Wi-Fi booster back to a freshly rooted modem.
+#
+# This follows the tch-gui-unhide wiki for a new root install:
+#   reset-to-factory-defaults-with-root
+#   de-telstra -A
+#   tch-gui-unhide
+#
+# The Wi-Fi backhaul, booster pages, and saved upstream network are removed.
+# Root access and the current SSH key are kept. CWMP is left off for the
+# first boot. The root password is set back to root.
+#
+#   ./restore-fresh-root -I 192.168.100.2 -y
+#
+# After it reboots it is a normal modem again, not a bridge. Plug a computer
+# into a LAN port to reach the address you passed with -I. Plug the WAN port
+# into the main modem if no USB stick is inserted, so the fresh setup can
+# download. A USB stick that is already inserted is used instead.
+
+SCRIPT="$(basename "$0")"
+GREEN='\033[1;32m'
+ORANGE='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+usage() {
+cat <<EOH
+Puts this booster back to a freshly rooted modem.
+
+Usage: ./$SCRIPT [-I <lan-ip> | -i] [-y]
+
+Options:
+ -I <lan-ip>  LAN address after the reset
+ -i           Keep the LAN address this booster has now
+ -y           Do not ask for confirmation
+
+With neither -I nor -i, the modem returns on its factory LAN address.
+
+Example:
+  ./$SCRIPT -I 192.168.100.2 -y
+
+This wipes the booster setup and reboots. It does not restore a USB backup.
+EOH
+exit 1
+}
+
+IP=""
+KEEP_IP="N"
+YES="N"
+
+while getopts :I:iy option; do
+  case "$option" in
+    I) IP="$OPTARG";;
+    i) KEEP_IP="Y";;
+    y) YES="Y";;
+    *) usage;;
+  esac
+done
+
+if [ -n "$IP" ] && [ "$KEEP_IP" = "Y" ]; then
+  echo -e "${RED}Use -I or -i, not both.${NC}"
+  exit 1
+fi
+
+if [ -n "$IP" ]; then
+  echo "$IP" | grep -qE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' || {
+    echo -e "${RED}Invalid LAN address: $IP${NC}"
+    exit 1
+  }
+fi
+
+if [ ! -x /root/dja-backhaul/run.sh ] && [ ! -x /etc/init.d/dja-backhaul ]; then
+  echo -e "${RED}This does not look like the Wi-Fi booster. Nothing was changed.${NC}"
+  exit 1
+fi
+
+case "$0" in
+  /tmp/*) ;;
+  *)
+    cp "$0" /tmp/restore-fresh-root
+    chmod 755 /tmp/restore-fresh-root
+    exec /tmp/restore-fresh-root "$@"
+    ;;
+esac
+
+RESET=/root/reset-to-factory-defaults-with-root
+if [ ! -f "$RESET" ]; then
+  echo -e "${RED}reset-to-factory-defaults-with-root is not in /root.${NC}"
+  exit 1
+fi
+
+VERSION="$(uci -q get version.@version[0].marketing_version)"
+if [ -z "$VERSION" ]; then
+  echo -e "${RED}Could not read the firmware version.${NC}"
+  exit 1
+fi
+
+if [ -f /proc/banktable/booted ]; then
+  BOOTED="$(cat /proc/banktable/booted)"
+else
+  BOOTED="bank_$(bootmgr partition booted)"
+fi
+DEFAULTS="/overlay/${BOOTED}/etc/uci-defaults/zzz-9999-reroot"
+
+MOUNT="$(uci -q get mountd.mountd.path)"
+USB_NAME=""
+USB_DIR=""
+if [ -n "$MOUNT" ]; then
+  case "$MOUNT" in
+    */) ;;
+    *) MOUNT="$MOUNT/" ;;
+  esac
+  USB_NAME="$(ls "$MOUNT" 2>/dev/null | head -n 1)"
+  if [ -n "$USB_NAME" ]; then
+    USB_DIR="${MOUNT}${USB_NAME}/fresh-root"
+  fi
+fi
+
+echo
+echo "This puts the booster back to a freshly rooted modem."
+echo "The Wi-Fi backhaul and the booster pages will be removed."
+echo "Root and the current SSH key are kept. The root password becomes root."
+if [ -n "$IP" ]; then
+  echo "LAN address after reboot: $IP"
+elif [ "$KEEP_IP" = "Y" ]; then
+  echo "LAN address after reboot: the address it has now"
+else
+  echo "LAN address after reboot: the factory address"
+fi
+if [ -n "$USB_DIR" ]; then
+  echo "The fresh setup will be copied to the USB stick."
+else
+  echo "No USB stick is inserted."
+  echo "Plug the WAN port into the main modem so the setup can download after reboot."
+fi
+echo "After reboot, connect a computer to a LAN port. This will no longer be a bridge."
+echo
+
+if [ "$YES" != "Y" ]; then
+  printf 'Type y to wipe this booster and reboot: '
+  read answer
+  if [ "$answer" != "y" ] && [ "$answer" != "Y" ]; then
+    echo "Nothing was changed."
+    exit 1
+  fi
+fi
+
+write_clean_wrapper() {
+  cat > "$1" << 'END_WRAPPER'
+#!/bin/sh
+VERSION="$(uci get version.@version[0].marketing_version)"
+SCRIPT="tch-gui-unhide-$VERSION"
+
+if [ -f "$SCRIPT" -a "$(echo $* | grep -o -e '-U')" != '-U' ]; then
+  sh $SCRIPT -W $*
+else
+  if [ ! -f "$SCRIPT" ]; then
+    echo "$(date +%H:%M:%S): Platform script $SCRIPT not found in $(pwd)!"
+  fi
+  echo "$(date +%H:%M:%S): Attempting to download latest release for FW $VERSION from GitHub..."
+  RESPONSE_CODE=$(curl -gkLsI -o /dev/null -w '%{http_code}' https://github.com/seud0nym/tch-gui-unhide/releases/latest/download/$VERSION.tar.gz)
+  if [ "$RESPONSE_CODE" = 200 ]
+  then
+    curl -gkL https://github.com/seud0nym/tch-gui-unhide/releases/latest/download/$VERSION.tar.gz | tar -xzvf -
+    if [ -f "$SCRIPT" ]; then
+      sh $SCRIPT -W $(echo "$*" | sed -e 's/-U$//' -e 's/-U //g' -e 's/U//g')
+    fi
+  elif [ "$RESPONSE_CODE" = 404 ]
+  then
+    echo "$(date +%H:%M:%S): ERROR! No latest release found on GitHub for FW $VERSION"
+  elif [ "$RESPONSE_CODE" = 000 ]
+  then
+    echo "$(date +%H:%M:%S): ERROR! No Internet connection???"
+  else
+    echo "$(date +%H:%M:%S): ERROR! Unknown response for latest FW $VERSION release on GitHub [$RESPONSE_CODE]"
+  fi
+fi
+END_WRAPPER
+  chmod 755 "$1"
+}
+
+if [ -n "$USB_DIR" ]; then
+  if [ ! -f /root/de-telstra ] || [ ! -f "/root/tch-gui-unhide-$VERSION" ]; then
+    echo -e "${RED}de-telstra or tch-gui-unhide-$VERSION is missing, so the USB copy cannot be made.${NC}"
+    exit 1
+  fi
+  mkdir -p "$USB_DIR" || {
+    echo -e "${RED}Could not create $USB_DIR${NC}"
+    exit 1
+  }
+  cp /root/de-telstra "$USB_DIR/de-telstra"
+  cp "/root/tch-gui-unhide-$VERSION" "$USB_DIR/tch-gui-unhide-$VERSION"
+  write_clean_wrapper "$USB_DIR/tch-gui-unhide"
+  echo -e "${GREEN}Copied a clean setup to $USB_DIR${NC}"
+fi
+
+cp "$RESET" /tmp/reset-to-factory-defaults-with-root
+chmod 755 /tmp/reset-to-factory-defaults-with-root
+
+RESET_ARGS="-c -k -y -n"
+if [ -n "$IP" ]; then
+  RESET_ARGS="-I $IP $RESET_ARGS"
+elif [ "$KEEP_IP" = "Y" ]; then
+  RESET_ARGS="-i $RESET_ARGS"
+fi
+
+echo -e "${ORANGE}Resetting to factory defaults and keeping root...${NC}"
+# shellcheck disable=SC2086
+sh /tmp/reset-to-factory-defaults-with-root $RESET_ARGS
+if [ ! -f "$DEFAULTS" ]; then
+  echo -e "${RED}The factory reset did not write $DEFAULTS. Not rebooting.${NC}"
+  exit 1
+fi
+
+sed -i '$ { /^exit 0$/d; }' "$DEFAULTS"
+
+cat >> "$DEFAULTS" << 'END_DEFAULTS'
+cat > /root/finish-fresh-root.sh << 'END_FINISH'
+#!/bin/sh
+LOG=/root/fresh-root.log
+exec >>"$LOG" 2>&1
+echo "fresh-root start $(date)"
+logger -t fresh-root "starting de-telstra and tch-gui-unhide"
+
+mount_path() {
+  path="$(uci -q get mountd.mountd.path)"
+  [ -z "$path" ] && return 1
+  case "$path" in
+    */) ;;
+    *) path="$path/" ;;
+  esac
+  echo "$path"
+}
+
+apply_usb() {
+  path="$(mount_path)" || return 1
+  name="$(ls "$path" 2>/dev/null | head -n 1)"
+  [ -z "$name" ] && return 1
+  src="${path}${name}/fresh-root"
+  [ -x "$src/de-telstra" ] || return 1
+  [ -f "$src/tch-gui-unhide" ] || return 1
+  ls "$src"/tch-gui-unhide-* >/dev/null 2>&1 || return 1
+  echo "using USB $src"
+  cp "$src/de-telstra" /root/de-telstra
+  cp "$src"/tch-gui-unhide-* /root/
+  cp "$src/tch-gui-unhide" /root/tch-gui-unhide
+  chmod 755 /root/de-telstra /root/tch-gui-unhide /root/tch-gui-unhide-*
+  cd /root || return 1
+  ./de-telstra -A -y
+  ./tch-gui-unhide -y
+}
+
+apply_download() {
+  ip route show 2>/dev/null | grep -q '^default' || return 1
+  echo "downloading a clean tch-gui-unhide release"
+  cd /tmp || return 1
+  curl -skL -o /tmp/tgu-get https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get || return 1
+  [ -s /tmp/tgu-get ] || return 1
+  sh /tmp/tgu-get -r -h -g
+}
+
+n=0
+ok=0
+while [ "$n" -lt 36 ]; do
+  if apply_usb || apply_download; then
+    ok=1
+    echo "fresh-root done $(date)"
+    logger -t fresh-root "finished"
+    break
+  fi
+  n=$((n + 1))
+  sleep 5
+done
+
+if [ "$ok" != 1 ]; then
+  echo "fresh-root FAILED: no USB scripts and no internet $(date)"
+  logger -t fresh-root "failed: no USB scripts and no internet"
+fi
+
+cat > /etc/rc.local << 'END_RC_STOCK'
+#!/bin/sh
+. /lib/config/uci.sh
+uci_set_state system boot '' boot
+uci_set_state system boot done 1
+
+exit 0
+END_RC_STOCK
+chmod 755 /etc/rc.local
+rm -f /root/finish-fresh-root.sh
+END_FINISH
+chmod 755 /root/finish-fresh-root.sh
+cat > /etc/rc.local << 'END_RC'
+#!/bin/sh
+. /lib/config/uci.sh
+uci_set_state system boot '' boot
+uci_set_state system boot done 1
+/root/finish-fresh-root.sh >/root/fresh-root.log 2>&1 &
+exit 0
+END_RC
+chmod 755 /etc/rc.local
+exit 0
+END_DEFAULTS
+
+chmod 755 "$DEFAULTS"
+sync
+echo -e "${GREEN}Factory reset is prepared. Rebooting.${NC}"
+echo "After it comes back, the log is /root/fresh-root.log"
+if [ -e /proc/sysrq-trigger ]; then
+  sleep 1
+  echo 1 > /proc/sys/kernel/sysrq
+  echo b > /proc/sysrq-trigger
+else
+  reboot
+fi
+sleep 10

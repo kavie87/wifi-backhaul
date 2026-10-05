@@ -77,7 +77,7 @@ The connection may drop. Wait a couple of minutes for the network to come back u
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
 
-The hidden main-modem backhaul is not part of a normal install. `./wifi-backhaul -b -y` adds the Wi-Fi Booster card that can collect it. That is described with the installer options below.
+The hidden main-modem backhaul is not part of a normal install. `./wifi-backhaul -b -y` adds the Wi-Fi Booster card that can collect it. `./wifi-backhaul -s -y` copies the upstream 2.4 GHz and 5 GHz names and passwords onto this booster. `./wifi-backhaul -bs -y` does that copy and then aims the backhaul at the hidden network. Both are described with the installer options below.
 
 The same details can still be read on the main modem:
 
@@ -214,6 +214,7 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | `-i` | Not required. `pre-booster` has already set the address |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
+| `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios. The backhaul stays on the network already saved. `./wifi-backhaul -U -y` keeps this if `-s` was already used and the copy has not finished |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
@@ -226,7 +227,13 @@ The main modem's backhaul name is hidden, so a scan does not show it. Use the ca
 2. Open the Wi-Fi Booster card. The Main backhaul tab reads the hidden name and BSSID from the main modem and saves them. The password stays on the booster and is not shown.
 3. Open Wi-Fi Backhaul again. The hidden network is listed as Main backhaul. Connect on that row leaves the visible Telstra network and joins that BSSID.
 
-That hidden network is on the main modem's 5 GHz radio, so it uses the same channel as the main's Telstra network. The booster's own 5 GHz network stays on that channel too. Its 2.4 GHz network can use another channel. The local names are changed on the Wi-Fi page. Use the same spelling as the main, `Telstra1B279D`, with no extra hyphen.
+That hidden network is on the main modem's 5 GHz radio, so it uses the same channel as the main's Telstra network. The booster's own 5 GHz network stays on that channel too. Its 2.4 GHz network can use another channel. The local names are changed on the Wi-Fi page, or by `-s` below. Use the same spelling as the main, `Telstra1B279D`, with no extra hyphen.
+
+`./wifi-backhaul -s -y` copies the names and passwords from the modem this booster is joined to. It reads that modem's 2.4 GHz client network and its 5 GHz client network, then puts those names and passwords on this booster's own 2.4 GHz and 5 GHz networks. Guest networks are left as they are. The backhaul keeps the network already chosen in Wi-Fi Backhaul.
+
+The copy runs when the backhaul link is up. If it is not up yet, the installer remembers `-s` and copies the names the next time the link connects. `./wifi-backhaul -U -y` leaves that pending copy in place. A new `./wifi-backhaul -y` without `-s` clears it.
+
+`./wifi-backhaul -bs -y` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords, and then points the backhaul at the main modem's hidden network. Connect to the visible Telstra network first so the copy can read that modem. The hidden network is the same 5 GHz channel. It may not accept this booster as a client, and the internet can drop. If it does not connect, open Wi-Fi Backhaul, forget that hidden network, and join the visible Telstra network again.
 
 ## Put the booster back
 

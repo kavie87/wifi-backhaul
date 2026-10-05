@@ -6,7 +6,7 @@ The upstream network name and password are not in this download. After the boost
 
 ## Download and install
 
-Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. This does not reboot.
+Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. This does not reboot. You may need to reconnect the LAN or WAN cables, then open the new address.
 
 ```sh
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
@@ -37,7 +37,7 @@ curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get |
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
 ```
 
-Move the booster modem onto the same network as the main modem. Check that the LAN address is free first.
+Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 
 ```sh
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster

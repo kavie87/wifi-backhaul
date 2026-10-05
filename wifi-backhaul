@@ -19746,6 +19746,7 @@ else
   echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
   echo "  A saved upstream network on this device is kept."
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
+  echo "The connection may drop. Wait a couple of minutes for the network to come back up."
   echo "Open http://$LAN_IP/ when it finishes."
   echo "Remove the WAN connection now. The WAN port is now a LAN port."
   echo "It then uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi."
@@ -19903,6 +19904,7 @@ else
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."
   fi
   echo "Restarting services. The modem stays up."
+  echo "The connection may drop. Wait a couple of minutes for the network to come back up."
   ifdown wan >/dev/null 2>&1 || true
   ifdown wan6 >/dev/null 2>&1 || true
   brctl addif br-lan eth4 >/dev/null 2>&1 || true

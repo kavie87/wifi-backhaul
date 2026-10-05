@@ -77,7 +77,7 @@ The connection may drop. Wait a couple of minutes for the network to come back u
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
 
-The main modem's backhaul name is hidden, so it does not appear in a scan. Connect to the Telstra network from Wi-Fi Backhaul first. Then open the Wi-Fi Booster card, Main backhaul tab, and collect it. That saves the hidden name and BSSID for Wi-Fi Backhaul. The password stays on the booster and is not shown. Connect on the Main backhaul row is what joins that BSSID.
+The hidden main-modem backhaul is not part of a normal install. `./wifi-backhaul -b -y` adds the Wi-Fi Booster card that can collect it. That is described with the installer options below.
 
 The same details can still be read on the main modem:
 
@@ -149,8 +149,8 @@ The Advanced dashboard keeps the cards that matter on a booster.
 - Eco Settings, Diagnostics, Packages, System Extras, and Devices are hidden. Management can turn those cards on.
 - Management has one Wi-Fi Backhaul switch. That switch opens the backhaul card.
 - Internet Access shows the upstream network, signal, and rate. Backhaul download and upload sit in the corner of that card.
-- Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The password is the one on the main modem. The network name is not accepted as the password. The scan list is titled Available Networks, and its columns line up with Current Backhaul. A connected network offers Disconnect and Forget Network. Disconnect keeps the saved network and then offers Reconnect and Forget Network. Forget Network deletes it. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins. A collected main backhaul is listed as Main backhaul, and Connect joins that BSSID.
-- Wi-Fi Booster has a Main backhaul tab. While this booster is connected to a Telstra main modem, that tab reads the hidden backhaul name and BSSID and saves them for Wi-Fi Backhaul. The password is not shown.
+- Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The password is the one on the main modem. The network name is not accepted as the password. The scan list is titled Available Networks, and its columns line up with Current Backhaul. A connected network offers Disconnect and Forget Network. Disconnect keeps the saved network and then offers Reconnect and Forget Network. Forget Network deletes it. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
+- Wi-Fi Booster is not on the dashboard unless `./wifi-backhaul -b` was used. That card is described under Installer options.
 - Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.
 - Local Network shows this booster's address, and the backhaul address and gateway while the backhaul link is up.
 - USB Backup is the USB backup and restore page described below.
@@ -213,9 +213,20 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | --- | --- |
 | `-i` | Not required. `pre-booster` has already set the address |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
+| `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
+
+`./wifi-backhaul -b -y` adds the Wi-Fi Booster card. Refresh the page after it finishes.
+
+The main modem's backhaul name is hidden, so a scan does not show it. Use the card in this order:
+
+1. In Wi-Fi Backhaul, connect to the visible Telstra network and wait until that link is up.
+2. Open the Wi-Fi Booster card. The Main backhaul tab reads the hidden name and BSSID from the main modem and saves them. The password stays on the booster and is not shown.
+3. Open Wi-Fi Backhaul again. The hidden network is listed as Main backhaul. Connect on that row leaves the visible Telstra network and joins that BSSID.
+
+That hidden network is on the main modem's 5 GHz radio, so it uses the same channel as the main's Telstra network. The booster's own 5 GHz network stays on that channel too. Its 2.4 GHz network can use another channel. The local names are changed on the Wi-Fi page. Use the same spelling as the main, `Telstra1B279D`, with no extra hyphen.
 
 ## Put the booster back
 

@@ -45,7 +45,7 @@ A plain `./tch-gui-unhide -y` leaves the Telstra look. These flags are optional,
 ./tch-gui-unhide -Cs -tc -hn -dy -a5 -y
 ```
 
-`-C s` hides the separate Backhaul Download, Backhaul Upload, CPU, and RAM cards and shows the one summary chart card. Those separate cards can be switched on again in Management. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
+`./wifi-backhaul` already shows the one summary chart card, with CPU, RAM, backhaul download, and backhaul upload together. The separate chart cards stay in Management and can be switched on there. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 

@@ -1,0 +1,63 @@
+#!/bin/sh
+# Run this on the main modem. It reads that modem's backhaul and writes
+# four files. The password is not printed.
+#
+#   ./main-backhaul
+#
+# Copy the four files to the booster, then on the booster run:
+#   ./take-main-backhaul /tmp/dja-main-backhaul
+
+out=${1:-/tmp/dja-main-backhaul}
+ssid=$(uci -q get wireless.wl0_1.ssid)
+pass=$(uci -q get wireless.wl0_1.wpa_psk_key)
+bssid=
+if [ -r /sys/class/net/wl0.1/address ]; then
+  bssid=$(cat /sys/class/net/wl0.1/address)
+elif [ -r /sys/class/net/wl0_1/address ]; then
+  bssid=$(cat /sys/class/net/wl0_1/address)
+fi
+channel=$(uci -q get wireless.radio0.channel)
+
+ssid=$(printf '%s' "$ssid" | tr -d '\r\n')
+pass=$(printf '%s' "$pass" | tr -d '\r\n')
+bssid=$(printf '%s' "$bssid" | tr -d '\r\n' | tr 'A-F' 'a-f')
+channel=$(printf '%s' "$channel" | tr -cd '0-9')
+
+if [ -z "$ssid" ] || [ -z "$pass" ] || [ -z "$bssid" ]; then
+  echo "Could not read the main modem backhaul." >&2
+  exit 1
+fi
+if [ "$ssid" = "$pass" ]; then
+  echo "The network name is not the Wi-Fi password." >&2
+  exit 1
+fi
+case "$bssid" in
+  ??:??:??:??:??:??) ;;
+  *)
+    echo "The radio address is not usable." >&2
+    exit 1
+    ;;
+esac
+
+mkdir -p "$out"
+chmod 700 "$out"
+printf '%s' "$ssid" > "$out/ssid"
+printf '%s' "$pass" > "$out/password"
+printf '%s' "$bssid" > "$out/bssid"
+chmod 600 "$out/ssid" "$out/password" "$out/bssid"
+if [ -n "$channel" ] && [ "$channel" -ge 36 ] && [ "$channel" -le 196 ]; then
+  printf '%s\n' "$channel" > "$out/channel"
+  chmod 644 "$out/channel"
+else
+  rm -f "$out/channel"
+fi
+
+echo "Backhaul name: $ssid"
+echo "Radio address: $bssid"
+if [ -s "$out/channel" ]; then
+  echo "Channel: $channel"
+else
+  echo "Channel: not a 5 GHz channel, so it was not saved."
+fi
+echo "Files are in $out"
+echo "The password was saved and was not printed."

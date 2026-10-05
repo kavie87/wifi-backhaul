@@ -77,6 +77,22 @@ The connection may drop. Wait a couple of minutes for the network to come back u
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
 
+The main modem's backhaul name is hidden, so it does not appear in a scan. On the main modem, read it and write the files:
+
+```sh
+curl -skLo main-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/main-backhaul
+chmod +x main-backhaul
+./main-backhaul
+```
+
+Copy `/tmp/dja-main-backhaul` to the booster. The password file is included and is not printed. On the booster:
+
+```sh
+./take-main-backhaul /tmp/dja-main-backhaul
+```
+
+The Wi-Fi Backhaul card then lists that network as Main backhaul. Connect uses the saved password, so it is not typed into the page.
+
 ## Update an existing booster
 
 ```sh

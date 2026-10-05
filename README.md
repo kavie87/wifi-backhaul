@@ -20,7 +20,7 @@ Or plug the WAN port into a LAN port on the main modem, the same way a shop boos
 ./pre-booster -w -i 192.168.100.4 -y
 ```
 
-Open `http://192.168.100.4/` and confirm the page loads. With `-w`, that page is reachable after the next install, on the same cable. Then install:
+`-i`, `-w`, and `-y` are listed under Installer options. Open `http://192.168.100.4/` and confirm the page loads. With `-w`, that page is reachable after the next install, on the same cable. Then install:
 
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
@@ -59,7 +59,7 @@ chmod +x pre-booster
 ./pre-booster -w -i 192.168.100.4 -y
 ```
 
-Open `http://192.168.100.4/` and confirm the page loads. Then:
+`-i`, `-w`, and `-y` are listed under Installer options. Open `http://192.168.100.4/` and confirm the page loads. Then:
 
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
@@ -167,6 +167,24 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 `mtd-restore -fsr` does not work on this firmware. `-f` is not a valid option, so that command exits without restoring anything. The restore button runs `mtd-restore -sr`, which restores the saved configuration and then reboots.
 
 ## Installer options
+
+### pre-booster
+
+```text
+./pre-booster -w -i 192.168.100.4 -y
+```
+
+| Option | Effect |
+| --- | --- |
+| `-i` | LAN address for this modem. Required. On a `192.168.100.0` network the main modem is `192.168.100.1`, so pick another free address |
+| `-w` | Wired start. Plug the WAN port into a LAN port on the main modem. Waits until that modem gives the WAN port an address, checks the `-i` address is free and on that network, then saves it. The WAN session stays up |
+| `-y` | Do not ask for confirmation |
+
+With no `-w`, `./pre-booster -i 192.168.100.4 -y` moves the LAN address and restarts the network. It does not reboot. DHCP stays on.
+
+After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable opens the new address. Connect the Wi-Fi backhaul there. When that link is up, unplug the cable and move the booster.
+
+### wifi-backhaul
 
 ```text
 ./wifi-backhaul -y

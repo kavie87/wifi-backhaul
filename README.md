@@ -123,7 +123,8 @@ The basic Home view is the network map.
 
 The Advanced dashboard keeps the cards that matter on a booster.
 
-- Broadband is not shown.
+- Broadband is not shown. Mobile, DNS, Firewall, xDSL, NAT Helpers, and Relay Setup are removed, including from Management. Mobile is disabled.
+- Eco Settings, Diagnostics, Packages, and System Extras are hidden. Management can turn those cards on.
 - Internet Access shows the upstream network, signal, and rate.
 - Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The scan list is titled Available Networks, and its columns line up with Current Backhaul. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
 - Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.

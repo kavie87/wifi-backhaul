@@ -119,7 +119,7 @@ After that, `/root/wifi-backhaul -U -y` downloads and applies a newer copy.
 ./tch-gui-unhide -U -y
 ```
 
-That upgrade rewrites the web pages, then puts the booster pages back. If you run the tch-gui-unhide `get` command again and it replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -U -y` once more so later upgrades keep the pages.
+That upgrade rewrites the web pages, then puts the booster pages back. Content Sharing, Mobile, Printer Sharing, Parental Controls, and Relay Setup stay removed. The upgrade no longer prints `No such file or directory` for those cards. If you run the tch-gui-unhide `get` command again and it replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -U -y` once more so later upgrades keep the pages.
 
 ## What the booster does
 

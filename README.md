@@ -51,7 +51,7 @@ A plain `./tch-gui-unhide -y` leaves the Telstra look. These flags are optional,
 ./tch-gui-unhide -Cs -tc -hn -dy -a5 -y
 ```
 
-`./wifi-backhaul` already shows the one summary chart card, with CPU, RAM, backhaul download, and backhaul upload together. The separate chart cards stay in Management and can be switched on there. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
+`./wifi-backhaul` shows CPU, RAM, Backhaul Download, and Backhaul Upload as separate cards. `./tch-gui-unhide -Cs` is what removes those four and shows the one summary chart card instead. `./de-telstra -h` and `-d` set the hostname and domain name, and the booster install leaves those as they are. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 
@@ -145,7 +145,7 @@ The Advanced dashboard keeps the cards that matter on a booster.
 - Management is where card names are shown and cards are switched on or off. The backup card is labelled USB.
 - Diagnostics no longer has a TCP Dump tab.
 
-Backhaul download and upload graph cards stay hidden. The charts card stays available.
+CPU, RAM, Backhaul Download, and Backhaul Upload are shown. `./tch-gui-unhide -Cs` replaces those four with the summary chart card.
 
 ## Local Network page
 

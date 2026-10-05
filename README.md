@@ -34,24 +34,16 @@ Once the script has run, the WAN port is a LAN port. Leave the cable in place if
 
 ## Fresh setup
 
-`192.168.19.254` in older notes was only an example. Use the address for the network you are actually on.
-
 ```sh
 ./reset-to-factory-defaults-with-root -c
-curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s -- -g
-./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
-./tch-gui-unhide -y
+curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s --
+./de-telstra -A -y
+./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
 ```
 
-`-h` is the hostname and `-d` is the domain name. That is the only `de-telstra` command this setup needs. `./wifi-backhaul -y` turns off the other unused services, including WPS and UPnP, and removes them from the cards. It does not change EasyMesh or DumaOS.
+`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS.
 
-A plain `./tch-gui-unhide -y` leaves the Telstra look. These flags are optional, for when you want a different look:
-
-```sh
-./tch-gui-unhide -Cs -tc -hn -dy -a5 -y
-```
-
-`./wifi-backhaul` shows CPU, RAM, Backhaul Download, and Backhaul Upload as separate cards. `./tch-gui-unhide -Cs` is what removes those four and shows the one summary chart card instead. `./de-telstra -h` and `-d` set the hostname and domain name, and the booster install leaves those as they are. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
+`./tch-gui-unhide -Cs` shows the one summary chart card. A later `./wifi-backhaul -y` shows CPU, RAM, Backhaul Download, and Backhaul Upload instead. Run `./tch-gui-unhide -Cs` again after that install if you want the summary card back. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 
@@ -61,7 +53,7 @@ chmod +x pre-booster
 ./pre-booster -i 192.168.100.4 -y
 ```
 
-If the WAN port is plugged into the main modem instead, wait for that modem to address it:
+`./pre-booster -w` is the wired start, the same way a shop booster is plugged in at first. Plug the WAN port into a LAN port on the main modem. The script waits until that modem gives the WAN port an address, checks the address you chose is free and on that network, and saves it. The WAN session stays up, so this SSH connection is not dropped.
 
 ```sh
 ./pre-booster -w -i 192.168.100.4 -y

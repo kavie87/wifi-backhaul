@@ -19781,11 +19781,11 @@ else
   echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
   echo "The connection may drop. Wait a couple of minutes for the network to come back up."
   echo "Open http://$LAN_IP/ when it finishes."
-  echo "Remove the WAN connection now. The WAN port is now a LAN port."
+  echo "The WAN port becomes a LAN port. Leave that cable in place if it runs to the main modem."
   echo "It then uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi."
   echo "It also turns off unused services: WPS, UPnP, sharing, telephony, and NAT helpers."
   echo "Those are removed from the cards. You do not need de-telstra for that."
-  echo "Connect to this booster's Wi-Fi, renew that address, then connect the Wi-Fi backhaul."
+  echo "Connect the Wi-Fi backhaul from the page. When that link is up, unplug the cable and move this booster."
 fi
 if [ "$YES" != y ]; then
   echo -n "Enter y to continue: "
@@ -19991,12 +19991,13 @@ if [ "$UPDATE" = y ]; then
 else
   echo -e "${GREEN}Wi-Fi backhaul is installed.${NC}"
   echo "Browse to http://$LAN_IP/ and refresh the page."
-  echo "Remove the WAN connection now. The WAN port is now a LAN port."
+  echo "The WAN port is now a LAN port. Leave the cable in place if it runs to the main modem."
   echo "It gives out two addresses, one for a LAN port and one for Wi-Fi. Renew the computer address."
   echo "WPS, UPnP, sharing, telephony, and NAT helpers are off, and removed from the cards."
   echo "Mobile, DNS, Firewall, xDSL, NAT Helpers, and Relay Setup are removed from Management."
   echo "Eco Settings, Diagnostics, Packages, and System Extras are hidden. Management can turn them on."
   echo "Open http://$LAN_IP/ and connect the Wi-Fi backhaul."
+  echo "When that link is up, unplug the cable and move this booster."
   if [ ! -s /root/dja-backhaul/ssid ] || [ ! -s /root/dja-backhaul/password ]; then
     echo "Open the Wi-Fi Backhaul card and choose the upstream network."
   fi

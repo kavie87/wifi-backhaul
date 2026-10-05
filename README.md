@@ -14,7 +14,13 @@ chmod +x pre-booster
 ./pre-booster -i 192.168.100.4 -y
 ```
 
-Open `http://192.168.100.4/` and confirm the page loads. Then install:
+Or plug the WAN port into a LAN port on the main modem, the same way a shop booster is wired in at first. This waits until that modem gives the WAN port an address, then saves a free address on that network. The WAN session stays up.
+
+```sh
+./pre-booster -w -i 192.168.100.4 -y
+```
+
+Open `http://192.168.100.4/` and confirm the page loads. With `-w`, that page is reachable after the next install, on the same cable. Then install:
 
 ```sh
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
@@ -24,7 +30,7 @@ chmod +x wifi-backhaul
 
 The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns off unused services, including WPS and UPnP, and removes them from the cards. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
 
-Once the script has run, remove the WAN connection now. The WAN port is now a LAN port. Connect to this booster's Wi-Fi, open the new address, such as `http://192.168.100.4/`, and from there connect the Wi-Fi backhaul.
+Once the script has run, the WAN port is a LAN port. Leave the cable in place if it runs to the main modem. Open the new address, such as `http://192.168.100.4/`, and connect the Wi-Fi backhaul. When that link is up, unplug the cable and move the booster.
 
 ## Fresh setup
 
@@ -55,6 +61,12 @@ chmod +x pre-booster
 ./pre-booster -i 192.168.100.4 -y
 ```
 
+If the WAN port is plugged into the main modem instead, wait for that modem to address it:
+
+```sh
+./pre-booster -w -i 192.168.100.4 -y
+```
+
 Open `http://192.168.100.4/` and confirm the page loads. Then:
 
 ```sh
@@ -65,10 +77,10 @@ chmod +x wifi-backhaul
 
 The connection may drop. Wait a couple of minutes for the network to come back up. When it finishes:
 
-1. Remove the WAN connection now. The WAN port is now a LAN port.
-2. Connect to this booster's Wi-Fi.
-3. Open the new address, `http://192.168.100.4/`.
-4. From that page, open the Wi-Fi Backhaul card and connect the Wi-Fi backhaul.
+1. The WAN port is now a LAN port. Leave the cable in place if it runs to the main modem.
+2. Open the new address, `http://192.168.100.4/`.
+3. From that page, open the Wi-Fi Backhaul card and connect the Wi-Fi backhaul.
+4. When that link is up, unplug the cable and move the booster.
 5. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
 
 Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.

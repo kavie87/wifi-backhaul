@@ -22,7 +22,7 @@ chmod +x wifi-backhaul
 ./wifi-backhaul -y
 ```
 
-The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
+The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns off unused services, including WPS and UPnP, and removes them from the cards. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
 
 Once the script has run, remove the WAN connection now. The WAN port is now a LAN port. Connect to this booster's Wi-Fi, open the new address, such as `http://192.168.100.4/`, and from there connect the Wi-Fi backhaul.
 
@@ -33,9 +33,19 @@ Once the script has run, remove the WAN connection now. The WAN port is now a LA
 ```sh
 ./reset-to-factory-defaults-with-root -c
 curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s -- -g
-./de-telstra -S -M -ma -h DJA0231-Booster -d DJA0231-Booster -y
-./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
+./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
+./tch-gui-unhide -y
 ```
+
+`-h` is the hostname and `-d` is the domain name. That is the only `de-telstra` command this setup needs. `./wifi-backhaul -y` turns off the other unused services, including WPS and UPnP, and removes them from the cards. It does not change EasyMesh or DumaOS.
+
+A plain `./tch-gui-unhide -y` leaves the Telstra look. These flags are optional, for when you want a different look:
+
+```sh
+./tch-gui-unhide -Cs -tc -hn -dy -a5 -y
+```
+
+`-C s` keeps only the summary chart card. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 

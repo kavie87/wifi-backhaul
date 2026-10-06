@@ -111,13 +111,15 @@ If the link is not up yet, the installer waits and copies the names the next tim
 
 Refresh the page. The card is left out of a normal install. `./wifi-backhaul -U -y` keeps it if `-b` was already used.
 
-The hidden backhaul name does not appear in a scan. With the booster connected to the visible Telstra network:
+With the booster connected to the visible Telstra network, open the Wi-Fi Booster card and choose Collect main backhaul. The card reads three values and does not show the password:
 
-1. Open the Wi-Fi Booster card.
-2. The Main backhaul tab reads the hidden name from the main modem and saves it. The password is not shown.
-3. Wi-Fi Backhaul lists it as Main backhaul.
+1. The backhaul name, from the main modem's Wi-Fi Boosters page.
+2. The password for the hidden backhaul radio. The wireless page hides that radio, so this is not the visible network's password.
+3. The beacon address from the scan. The MAC on the wireless page belongs to the other radio. Saving that address makes the join fail.
 
-That hidden network is on the main modem's 5 GHz radio, so it uses the same channel as the visible Telstra network. This booster does not get internet from it. The main modem has no option that turns that hidden network into a normal client link. For internet, stay on the visible Telstra network. If a join to the hidden network drops the internet, use Forget Network on that row and connect to the visible network again.
+Wi-Fi Backhaul then lists it as Main backhaul. Connect uses the saved password and that beacon address. The same three values are what a working booster writes under `/root/dja-backhaul/`. Firmware `20.3.c.0389` has these pages.
+
+The backhaul uses the main modem's 5 GHz channel. If that join drops the internet, use Forget Network on that row and connect to the visible Telstra network again.
 
 ### 4. Copy the names and aim the backhaul at the hidden network
 
@@ -125,9 +127,9 @@ That hidden network is on the main modem's 5 GHz radio, so it uses the same chan
 ./wifi-backhaul -U -bs -y
 ```
 
-`-bs` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords, and then points the backhaul at the hidden network. Connect to the visible Telstra network first, so the copy can read that modem.
+`-bs` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords, and then points the backhaul at the hidden network. Connect to the visible Telstra network first, so it can read that network's name, password, and beacon address.
 
-The internet can drop, because the hidden network may not accept this booster. Forget that hidden network in Wi-Fi Backhaul and join the visible Telstra network again. Type that password again if the saved one was replaced.
+If the beacon is not in the scan yet, the switch waits. If the internet drops, Forget that network in Wi-Fi Backhaul and join the visible Telstra network again. Type that password again if the saved one was replaced.
 
 ### 5. Update, then run tch-gui-unhide
 
@@ -147,7 +149,7 @@ That rewrites the pages and puts the booster pages back. Content Sharing, Mobile
 
 ## Read the hidden network on the main modem
 
-The same details can still be read on the main modem:
+On the main modem, `./main-backhaul` reads the backhaul radio, that radio's password, and the address the radio transmits. Copy the files across and the Wi-Fi Backhaul card can connect with them:
 
 ```sh
 curl -skLo main-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/main-backhaul
@@ -287,7 +289,7 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
 
-The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords and leaves the backhaul on the visible network. `-b` adds the Wi-Fi Booster card. `-bs` does both, then aims the backhaul at the hidden network. That hidden network uses the same 5 GHz channel as the visible Telstra network, and it may not carry internet for this booster.
+The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords and leaves the backhaul on the visible network. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` does both, then aims the backhaul at that hidden network. It uses the same 5 GHz channel as the visible Telstra network.
 
 ## Put the booster back
 

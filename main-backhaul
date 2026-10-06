@@ -8,20 +8,38 @@
 #   ./take-main-backhaul /tmp/dja-main-backhaul
 
 out=${1:-/tmp/dja-main-backhaul}
-ssid=$(uci -q get wireless.wl0_1.ssid)
-pass=$(uci -q get wireless.wl0_1.wpa_psk_key)
-bssid=
-if [ -r /sys/class/net/wl0.1/address ]; then
-  bssid=$(cat /sys/class/net/wl0.1/address)
-elif [ -r /sys/class/net/wl0_1/address ]; then
-  bssid=$(cat /sys/class/net/wl0_1/address)
+
+# This modem's backhaul is the interface marked backhaul=1, usually wl1_2.
+# The password is on the AP section for that interface. The address the
+# radio transmits is cur_etheraddr, not the MAC shown on the wireless page.
+iface=$(uci show wireless 2>/dev/null | sed -n "s/^wireless\\.\\([^=]*\\)\\.backhaul='1'\$/\\1/p" | head -1)
+[ -n "$iface" ] || iface=wl0_1
+ssid=$(uci -q get "wireless.$iface.ssid")
+pass=
+for ap in $(uci show wireless 2>/dev/null | sed -n "s/^wireless\\.\\([^=]*\\)\\.iface='$iface'\$/\\1/p"); do
+  pass=$(uci -q get "wireless.$ap.wpa_psk_key")
+  [ -n "$pass" ] && break
+done
+[ -n "$pass" ] || pass=$(uci -q get "wireless.$iface.wpa_psk_key")
+bssid=$(wl -i "$iface" cur_etheraddr 2>/dev/null | grep -o -E '([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}' | head -1)
+if [ -z "$bssid" ] && [ -r "/sys/class/net/$iface/address" ]; then
+  bssid=$(cat "/sys/class/net/$iface/address")
 fi
-channel=$(uci -q get wireless.radio0.channel)
+dotted=$(printf '%s' "$iface" | tr '_' '.')
+if [ -z "$bssid" ] && [ -r "/sys/class/net/$dotted/address" ]; then
+  bssid=$(cat "/sys/class/net/$dotted/address")
+fi
+device=$(uci -q get "wireless.$iface.device")
+channel=$(uci -q get "wireless.$device.channel")
+[ -n "$channel" ] || channel=$(uci -q get wireless.radio0.channel)
 
 ssid=$(printf '%s' "$ssid" | tr -d '\r\n')
 pass=$(printf '%s' "$pass" | tr -d '\r\n')
 bssid=$(printf '%s' "$bssid" | tr -d '\r\n' | tr 'A-F' 'a-f')
 channel=$(printf '%s' "$channel" | tr -cd '0-9')
+if [ -z "$channel" ]; then
+  channel=$(wl -i "$iface" chanspec 2>/dev/null | sed -n 's/^\([0-9][0-9]*\).*/\1/p' | head -1)
+fi
 
 if [ -z "$ssid" ] || [ -z "$pass" ] || [ -z "$bssid" ]; then
   echo "Could not read the main modem backhaul." >&2

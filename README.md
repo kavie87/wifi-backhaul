@@ -4,7 +4,19 @@ This turns a rooted Telstra DJA0231 into a Wi-Fi booster. It joins the main mode
 
 The upstream network name and password are not in this download. After the booster boots, choose that network in the Wi-Fi Backhaul card.
 
-Thank you to [seud0nym/tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide) for providing the ability to root these devices.
+## Acknowledgements
+
+A huge thank you to [seud0nym/tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide) for the assistance he has offered me over the years and the wider Technicolor modding community for the work that makes projects like this possible.
+
+The ability to root and unlock these devices is built on the work of others who have spent considerable time researching, documenting and developing tools for Technicolor hardware.
+
+This project does not attempt to replace or take credit for that work. Instead, it builds on that foundation by exploring another use for rooted Telstra Gen 2 hardware — in this case, making it easier to repurpose a spare device as a wireless backhaul/booster.
+
+Without the work of projects such as [tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide), this project simply wouldn't exist.
+
+If you're new to rooting or modifying these devices, be sure to visit [seud0nym's GitHub repository](https://github.com/seud0nym/tch-gui-unhide) to learn more about the rooting/unlocking process and the work that has gone into making these devices accessible for further modification.
+
+A massive thank you to seud0nym and everyone in the Technicolor modding community who has contributed their time, knowledge and discoveries over the years.
 
 ## Download and install
 

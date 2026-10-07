@@ -20079,6 +20079,7 @@ if [ "$TEST" = y ]; then
     dja-backhaul/bin/wpa_supplicant \
     init.dja-backhaul \
     tch-gui-unhide-xtra.dja-backhaul \
+    restore-fresh-root \
     restore-fresh-root
   do
     if [ ! -s "$tmp/$need" ]; then

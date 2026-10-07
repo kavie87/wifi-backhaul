@@ -331,6 +331,13 @@ The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the u
 
 `restore-fresh-root` removes the Wi-Fi booster and returns the modem to a freshly rooted setup, the same path as the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki). The root password is set back to `root`. The upstream network and the booster pages are not kept. This is not the USB backup restore. That restore puts the booster setup back.
 
+Download it first. The shell does not search the current directory, so the command starts with `./`.
+
+```sh
+curl -skLo restore-fresh-root https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/restore-fresh-root
+chmod +x restore-fresh-root
+```
+
 ### `./restore-fresh-root -y`
 
 This does the three steps and returns the modem on its factory LAN address:

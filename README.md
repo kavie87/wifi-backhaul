@@ -46,7 +46,7 @@ curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get |
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
 ```
 
-`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS. To choose the hostname and domain name yourself, run:
+`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS. To choose the hostname and domain name yourself, replace `DJA0231-Booster` in this example with the name you want, then run:
 
 ```sh
 ./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y

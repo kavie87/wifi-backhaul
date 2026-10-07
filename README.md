@@ -4,6 +4,8 @@ This turns a rooted Telstra DJA0231 into a Wi-Fi booster. It joins the main mode
 
 The upstream network name and password are not in this download. After the booster boots, choose that network in the Wi-Fi Backhaul card.
 
+Thank you to [seud0nym/tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide) for providing the ability to root these devices.
+
 ## Download and install
 
 Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. This does not reboot. You may need to reconnect the LAN or WAN cables, then open the new address.

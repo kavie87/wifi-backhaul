@@ -52,7 +52,7 @@ curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get |
 ./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
 ```
 
-`./tch-gui-unhide -Cs` shows the one summary chart card. A later `./wifi-backhaul -y` shows CPU, RAM, Backhaul Download, and Backhaul Upload instead. Run `./tch-gui-unhide -Cs` again after that install if you want the summary card back. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
+`./tch-gui-unhide -Cs` shows the one summary chart card. A later `./wifi-backhaul -y` shows CPU, RAM, Backhaul Download, and Backhaul Upload instead. Run `./tch-gui-unhide -Cs` again after that install if you want the summary card back. `-tc` uses the classic theme. `-hn` sets the browser title to the hostname. `-dy` allows the page without a password. `-a5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 

@@ -303,20 +303,23 @@ The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the u
 ### restore-fresh-root
 
 ```text
+./restore-fresh-root -y
 ./restore-fresh-root -I 192.168.100.2 -y
 ```
 
 | Option | Effect |
 | --- | --- |
-| `-I` | LAN address after the reset |
+| `-I` | LAN address after the reset. `./restore-fresh-root -y` leaves this off and uses the factory LAN address |
 | `-i` | Keep the LAN address this booster has now. Do not use this with `-I` |
 | `-y` | Do not ask for confirmation |
 
-With neither `-I` nor `-i`, the modem returns on its factory LAN address.
-
 ## Put the booster back
 
-`restore-fresh-root` removes the Wi-Fi booster and returns the modem to a freshly rooted setup, the same path as the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki). You run the one command below. It does these three steps:
+`restore-fresh-root` removes the Wi-Fi booster and returns the modem to a freshly rooted setup, the same path as the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki). The root password is set back to `root`. The upstream network and the booster pages are not kept. This is not the USB backup restore. That restore puts the booster setup back.
+
+### `./restore-fresh-root -y`
+
+This does the three steps and returns the modem on its factory LAN address:
 
 1. Copy the reset script to `/tmp` and run it from there. That keeps root and the current SSH key, and turns CWMP off for the first boot.
 
@@ -329,12 +332,16 @@ sh reset-to-factory-defaults-with-root -c -y
 2. `./de-telstra -A`
 3. A clean `./tch-gui-unhide`, without the booster pages.
 
-`-I` sets the LAN address the modem uses after that reset:
+```sh
+./restore-fresh-root -y
+```
+
+### `./restore-fresh-root -I 192.168.100.2 -y`
+
+This does the same reset, then brings the modem back on the address passed with `-I`.
 
 ```sh
 ./restore-fresh-root -I 192.168.100.2 -y
 ```
 
-The root password is set back to `root`. The upstream network and the booster pages are not kept. This is not the USB backup restore. That restore puts the booster setup back.
-
-After the reboot it is a normal modem again. Plug a computer into a LAN port and open the address you passed with `-I`. If a USB stick is already inserted, the script copies `de-telstra` and a clean unhide onto it and uses those after the reboot. With no USB stick, plug the WAN port into the main modem so those two scripts can download. The result is written to `/root/fresh-root.log`.
+After the reboot it is a normal modem again. Plug a computer into a LAN port and open that address. If a USB stick is already inserted, the script copies `de-telstra` and a clean unhide onto it and uses those after the reboot. With no USB stick, plug the WAN port into the main modem so those two scripts can download. The result is written to `/root/fresh-root.log`.

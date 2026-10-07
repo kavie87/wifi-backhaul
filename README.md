@@ -46,7 +46,11 @@ curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get |
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
 ```
 
-`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS.
+`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS. To choose the hostname and domain name yourself, run:
+
+```sh
+./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
+```
 
 `./tch-gui-unhide -Cs` shows the one summary chart card. A later `./wifi-backhaul -y` shows CPU, RAM, Backhaul Download, and Backhaul Upload instead. Run `./tch-gui-unhide -Cs` again after that install if you want the summary card back. `-t c` uses the classic theme. `-h n` sets the browser title to the hostname. `-d y` allows the page without a password. `-a 5` shows five cards across.
 

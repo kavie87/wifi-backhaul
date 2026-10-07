@@ -35,7 +35,12 @@ Once the script has run, the WAN port is a LAN port. Leave the cable in place if
 ## Fresh setup
 
 ```sh
-./reset-to-factory-defaults-with-root -c
+cp -p reset-to-factory-defaults-with-root /tmp
+cd /tmp
+sh reset-to-factory-defaults-with-root -c -y
+```
+
+```sh
 curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s --
 ./de-telstra -A -y
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y

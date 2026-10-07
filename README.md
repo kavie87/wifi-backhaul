@@ -304,7 +304,14 @@ The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the u
 
 `restore-fresh-root` removes the Wi-Fi booster and returns the modem to a freshly rooted setup, the same path as the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki):
 
-1. `reset-to-factory-defaults-with-root` keeps root and the current SSH key, and turns CWMP off for the first boot.
+1. Copy the reset script to `/tmp` and run it from there. That keeps root and the current SSH key, and turns CWMP off for the first boot.
+
+```sh
+cp -p reset-to-factory-defaults-with-root /tmp
+cd /tmp
+sh reset-to-factory-defaults-with-root -c -y
+```
+
 2. `de-telstra -A`
 3. A clean `tch-gui-unhide`, without the booster pages.
 

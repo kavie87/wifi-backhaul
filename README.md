@@ -535,81 +535,192 @@ The basic Home view is the network map.
 
 ## Dashboard cards
 
-The Advanced dashboard keeps the cards that matter on a booster.
+The **Advanced** dashboard has been simplified to focus on the features relevant to a wireless booster. Unnecessary services and cards have been removed or hidden, while the remaining cards provide access to network settings, connection monitoring and management.
 
-- Broadband is not shown. Mobile, DNS, Firewall, xDSL, NAT Helpers, and Relay Setup are removed, including from Management. Mobile is disabled.
-- Eco Settings, Diagnostics, Packages, System Extras, and Devices are hidden. Management can turn those cards on. Device Security is removed.
-- Management has one Wi-Fi Backhaul switch. That switch opens the backhaul card.
-- Internet Access shows the upstream network, signal, and rate. Backhaul download and upload sit in the corner of that card.
-- Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The password is the one on the main modem. The network name is not accepted as the password. The scan list is titled Available Networks, and its columns line up with Current Backhaul. A network this booster has joined stays in that list as Saved, with Reconnect and Forget Network, and its password is kept when another network is chosen. A connected network offers Disconnect and Forget Network. Disconnect keeps the saved network and then offers Reconnect and Forget Network. Forget Network deletes that saved network. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
-- Wi-Fi Booster is not on the dashboard unless `./wifi-backhaul -b` was used. That card is described under Installer options.
-- Wi-Fi shows the local 2.4 GHz and 5 GHz names, with a gap between the two bands.
-- Local Network shows this booster's address, and the backhaul address and gateway while the backhaul link is up.
-- USB Backup is the USB backup and restore page described below.
-- Management is where card names are shown and cards are switched on or off. The backup card is labelled USB.
-- Diagnostics no longer has a TCP Dump tab.
+### Removed and hidden cards
 
-CPU, RAM, Backhaul Download, and Backhaul Upload are shown when `./tch-gui-unhide -Cs` was not used. `-Cs` replaces those four with the summary chart card, and `./wifi-backhaul` leaves them hidden.
+The following changes are made to the dashboard:
+
+- **Broadband:** Hidden, as the booster connects to the main modem over Wi-Fi rather than using its own broadband connection.
+- **Removed services:** Mobile, DNS, Firewall, xDSL, NAT Helpers and Relay Setup are removed from the dashboard and Management. The Mobile service is also disabled.
+- **Hidden cards:** Eco Settings, Diagnostics, Packages, System Extras and Devices are hidden by default but can be re-enabled through Management.
+- **Device Security:** Removed from the dashboard.
+- **Diagnostics:** The TCP Dump tab is removed.
+
+### Available dashboard cards
+
+- **Internet Access:** Displays the upstream Wi-Fi network, signal strength and connection rate. Backhaul download and upload statistics are shown in the corner of the card.
+- **Wi-Fi Backhaul:** Displays the active upstream connection, including its SSID, signal strength, connection rate, channel, channel width and uptime. It also allows you to scan for, connect to and manage wireless networks.
+- **Wi-Fi Booster:** An optional card for retrieving the main modem's hidden backhaul network information. It is only available when the installer has been run with `-b`.
+- **Wi-Fi:** Displays the booster's local 2.4 GHz and 5 GHz wireless networks, with each band clearly separated.
+- **Local Network:** Displays the booster's LAN IP address, along with the backhaul IP address and gateway when connected.
+- **USB Backup:** Provides access to USB configuration backups and restoration.
+- **Management:** Allows you to view, enable or disable dashboard cards. The Wi-Fi Backhaul card has its own switch, and USB Backup is labelled **USB**.
+
+### Managing Wi-Fi Backhaul connections
+
+The **Wi-Fi Backhaul** card provides two sections: **Current Backhaul** and **Available Networks**.
+
+**Current Backhaul** displays the active wireless connection and provides two options:
+
+- **Disconnect:** Disconnects from the current network while retaining its saved credentials.
+- **Forget Network:** Disconnects and removes the saved network and password.
+
+**Available Networks** displays networks discovered during scanning, including those previously connected to.
+
+Saved networks are marked **Saved** and provide the following options:
+
+- **Reconnect:** Reconnects using the stored password.
+- **Forget Network:** Removes the saved network and its credentials.
+
+When connecting to a network, the booster also saves a lock to the wireless radio (BSSID) it joined.
+
+- Disconnecting removes the active radio lock.
+- Connecting to a different network replaces the previous lock with the newly connected radio.
+- Reconnecting updates the saved radio lock to match the connection.
+
+This helps the booster reconnect to the intended wireless access point.
+
+**Important:** When connecting to a network, enter the Wi-Fi password configured on the main modem. The network name (SSID) cannot be used as the password.
+
+### System monitoring cards
+
+The dashboard's monitoring layout depends on how `tch-gui-unhide` was configured.
+
+By default, the following cards are available:
+
+- CPU
+- RAM
+- Backhaul Download
+- Backhaul Upload
+
+If `./tch-gui-unhide -Cs` was used, these four cards are replaced with a single summary chart.
+
+The Wi-Fi Backhaul installer respects this configuration and does not restore the individual cards when the summary chart is enabled.
 
 ## Local Network page
 
-- Local Network Subnet is shown and cannot be edited.
-- IPv6 is a read-only On or Off. It follows router advertisements from the main modem. It does not turn IPv6 on for the booster.
-- Local Domain Name and the booster IPv4 address can be changed. Saving the address changes this booster's LAN address.
-- Guest interfaces are not listed.
+The **Local Network** page has been adjusted to reflect the booster's role on the main modem's network.
+
+- **Local Network Subnet:** Displays the configured subnet but cannot be edited.
+- **IPv6:** Displays a read-only On or Off status based on router advertisements received from the main modem. This setting does not enable or disable IPv6 on the booster.
+- **Local Domain Name:** Can be changed to suit your network.
+- **IPv4 Address:** Allows you to change the booster's LAN IP address. Saving a new address updates the booster's network configuration.
+- **Guest interfaces:** Hidden, as guest networking is not supported on the booster.
 
 ## Wi-Fi page
 
-- The tabs are the local 2.4 GHz and local 5 GHz networks.
-- Under Protected Management Frames, Mirror Main Wi-Fi SSID has Copy. Copy takes the main modem's names once. If that modem is not connected, nothing is changed.
-- Guest names are not listed.
-- Wireless Control and Wifi Nurse are not listed.
-- Changing the local name or password is not applied to the backhaul interface.
+The **Wi-Fi** page manages the booster's local wireless networks independently of its upstream backhaul connection.
+
+- **Wireless bands:** Separate tabs are available for the local 2.4 GHz and 5 GHz networks.
+- **Mirror Main Wi-Fi SSID:** Located under **Protected Management Frames**, the **Copy** button retrieves the main modem's Wi-Fi names and passwords and applies them to the booster's local networks. This is a one-time synchronisation, equivalent to using `-s`.
+- **Guest Wi-Fi:** Guest network names are hidden.
+- **Wireless Control and Wifi Nurse:** These options are removed from the interface.
+- **Backhaul independence:** Changing the local Wi-Fi name or password does not modify the upstream backhaul connection.
+
+**Note:** Wi-Fi mirroring requires an active connection to the main modem. If the main modem is not connected, no settings are changed.
 
 ## USB backup
 
-The old commands are still on the booster. The USB Backup card runs them.
+The **USB Backup** card provides a convenient way to back up and restore the booster's configuration directly from the web interface.
 
-- Schedule daily backup turns the early-morning backup on. The same button then says Turn off daily backup, which removes it. Hour and Minute set the time: 4 and 8 is 4:08am. That job saves the configuration, environment, and overlay.
-- The same job is a row under Management, Scheduled Tasks, once daily backup is on. The command is `/root/mtd-backup -d backups -ceoy`. Minute and Hour there are the backup time. Change them on this page or on the USB Backup card. Turning Enabled off, or deleting the row, turns the daily backup off.
-- Backup now writes that same backup straight away.
-- Restore and reboot writes the saved configuration back and restarts the booster. It asks before it does that.
+The original backup and restore commands remain available through SSH, with the card providing an easier way to access the same functionality.
 
-A USB stick has to be plugged in first. The card shows whether one is inserted.
+### Available options
 
-`mtd-restore -fsr` does not work on this firmware. `-f` is not a valid option, so that command exits without restoring anything. The restore button runs `mtd-restore -sr`, which restores the saved configuration and then reboots.
+- **Schedule daily backup:** Enables an automatic daily backup of the configuration, environment and overlay. Once enabled, the button changes to **Turn off daily backup**, allowing you to remove the scheduled task. The same row is under Management → Scheduled Tasks, command `/root/mtd-backup -d backups -ceoy`. Minute and Hour there are the backup time. Turning Enabled off, or deleting the row, turns the daily backup off.
+- **Hour and Minute:** Allows you to customise when the daily backup runs. For example, setting Hour to `4` and Minute to `8` schedules the backup for 4:08 AM.
+- **Backup now:** Immediately creates a backup using the same process as the scheduled task.
+- **Restore and reboot:** Restores the saved configuration and restarts the booster. A confirmation prompt is displayed before proceeding.
+
+**Important:** A USB storage device must be connected before using the backup or restore functions. The card displays whether a USB device is detected.
+
+### Restore command compatibility
+
+On this firmware, the command `mtd-restore -fsr` does not work because `-f` is not a supported option.
+
+Instead, the **Restore and reboot** button uses:
+
+```bash
+mtd-restore -sr
+```
+
+This restores the saved configuration and reboots the booster.
 
 ## Installer options
 
+The following options are available for configuring, updating and managing Wi-Fi Backhaul.
+
 ### pre-booster
 
-```text
+The `pre-booster` script prepares the modem's network configuration before installing Wi-Fi Backhaul.
+
+Example:
+
+```bash
 ./pre-booster -w -i 192.168.100.4 -y
 ```
 
-| Option | Effect |
-| --- | --- |
-| `-i` | LAN address for this modem. Required. On a `192.168.100.0` network the main modem is `192.168.100.1`, so pick another free address |
-| `-w` | Wired start. Plug the WAN port into a LAN port on the main modem. Waits until that modem gives the WAN port an address, checks the `-i` address is free and on that network, then saves it. The WAN session stays up |
-| `-y` | Do not ask for confirmation |
+| Option | Description |
+|---|---|
+| `-i` | **Required.** Specifies the booster's LAN IP address. Choose an unused address on the main modem's network. |
+| `-w` | Enables wired setup using the WAN port connected to the main modem's LAN port. Obtains network information through DHCP, verifies the selected IP address is available and on the correct network, then saves it while maintaining the WAN session. |
+| `-y` | Automatically confirms prompts without asking for confirmation. |
 
-With no `-w`, `./pre-booster -i 192.168.100.4 -y` moves the LAN address and restarts the network. DHCP stays on.
+**Without `-w`:**
 
-After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable opens the new address. Connect the Wi-Fi backhaul there. When that link is up, unplug the cable and move the booster.
+```bash
+./pre-booster -i 192.168.100.4 -y
+```
 
-### wifi-backhaul
+The script changes the booster's LAN IP address and restarts networking. DHCP remains enabled.
 
-```text
+**With `-w`:**
+
+Connect the booster's WAN port to a LAN port on the main modem before running the script.
+
+Once `pre-booster` has completed, install Wi-Fi Backhaul:
+
+```bash
 ./wifi-backhaul -y
 ```
 
-| Option | Effect |
-| --- | --- |
-| `-i` | Not required. `pre-booster` has already set the address |
-| `-n` | Accepted |
-| `-t` | Check the packaged files and exit |
+The network connection may temporarily drop during installation. Once networking has restarted, you can access the booster at its configured IP address using the same Ethernet cable.
 
-`-U`, `-s`, `-S`, `-b`, `-bs`, `-bS` and `-y` are listed in the command reference under How to use it.
+Connect the wireless backhaul through the web interface before disconnecting the cable and relocating the booster.
+
+### wifi-backhaul
+
+The main installer configures the device for wireless backhaul operation and provides optional features for Wi-Fi synchronisation and hidden backhaul connectivity.
+
+Standard installation:
+
+```bash
+./wifi-backhaul -y
+```
+
+| Option | Description |
+|---|---|
+| `-i` | Not required. The LAN address is already configured by `pre-booster`. |
+| `-U` | Updates an existing installation while preserving saved network settings. |
+| `-b` | Enables the optional Wi-Fi Booster card for retrieving the main modem's hidden backhaul information. |
+| `-s` | Copies the main modem's 2.4 GHz and 5 GHz SSIDs and passwords once, including enabling band steering when it is enabled on the main modem. |
+| `-S` | Copies Wi-Fi settings immediately and creates a scheduled task to check for changes every hour. Set Hour to `*/6` under Management → Scheduled Tasks to run every 6 hours. |
+| `-bs` | Combines `-b` and `-s`, enabling the Wi-Fi Booster card, copying Wi-Fi settings once and attempting to connect to the hidden backhaul network. |
+| `-bS` | Combines hidden backhaul functionality with automatic hourly Wi-Fi synchronisation. |
+| `-y` | Automatically confirms installer prompts. |
+| `-n` | Accepted by the installer. |
+| `-t` | Checks the packaged files and exits without proceeding with installation. |
+
+### Additional notes
+
+- **Preserving configuration:** Running `./wifi-backhaul -U -y` retains existing network settings, including the Wi-Fi Booster card if it was previously enabled.
+- **Wi-Fi synchronisation:** The `-s` and `-S` options require an active connection to the main modem. If no connection is available, the Wi-Fi settings remain unchanged.
+- **Scheduled synchronisation:** The hourly task created by `-S` can be viewed and adjusted under **Management → Scheduled Tasks**.
+- **Hidden backhaul:** The `-b` option enables collection of the hidden network's SSID, password and beacon address.
+- **Wireless channel:** The booster's 5 GHz backhaul uses the same channel as the main modem.
+
+For detailed instructions and examples of each configuration option, refer to the **How to use it** section above.
 
 ### restore-fresh-root
 

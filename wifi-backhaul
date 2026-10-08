@@ -20440,12 +20440,6 @@ if [ "$UPDATE" = y ]; then
     kill $pid 2>/dev/null || true
     sleep 2
   fi
-  mkdir -p /tmp/dja-backhaul/web-control
-  chmod 1713 /tmp/dja-backhaul 2>/dev/null || true
-  chmod 733 /tmp/dja-backhaul/web-control 2>/dev/null || true
-  if ! ps w | grep -v grep | grep -q /root/dja-backhaul/web-control.sh; then
-    /root/dja-backhaul/web-control.sh >/dev/null 2>&1 &
-  fi
   echo -e "${GREEN}Wi-Fi backhaul is updated.${NC}"
   echo "Browse to http://$LAN_IP/ and refresh the page."
   if [ "$BOOSTER_CARD" != y ] || { [ "$SYNC_HOUR" != y ] && [ "$SYNC_ONCE" != y ]; }; then
@@ -20476,6 +20470,17 @@ else
   /etc/init.d/hostapd reload >/dev/null 2>&1 || true
   nginx -s reload >/dev/null 2>&1 || true
   /etc/init.d/dja-backhaul start >/dev/null 2>&1 || true
+fi
+
+# Every ./wifi-backhaul run leaves the folder the Connect button writes into.
+mkdir -p /tmp/dja-backhaul/web-control
+chmod 1713 /tmp/dja-backhaul 2>/dev/null || true
+chmod 733 /tmp/dja-backhaul/web-control
+if ! ps w | grep -v grep | grep -q /root/dja-backhaul/web-control.sh; then
+  /etc/init.d/dja-backhaul start >/dev/null 2>&1 || true
+fi
+if ! ps w | grep -v grep | grep -q /root/dja-backhaul/web-control.sh; then
+  /root/dja-backhaul/web-control.sh >/dev/null 2>&1 &
 fi
 
 if [ "$SYNC_ONCE" = y ] && [ "$SYNC_HOUR" != y ] && [ -x /root/dja-backhaul/sync-upstream-ssid ]; then

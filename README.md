@@ -18,31 +18,92 @@ If you're new to rooting or modifying these devices, I strongly encourage you to
 
 ## Download and install
 
-Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. You may need to reconnect the LAN or WAN cables, then open the new address.
+Before installing Wi-Fi Backhaul, you must run `pre-booster`. This prepares the rooted Telstra DJA0231 by assigning it an IP address on the same network as your main modem.
 
-```sh
+**Important:** Make sure the IP address you choose is not already being used by another device.
+
+For example, if your main modem uses `192.168.100.1`, you could assign the booster `192.168.100.4`, provided that address is available.
+
+### Step 1: Prepare the booster
+
+There are two ways to configure the booster's network address.
+
+**Option 1: Manual IP configuration**
+
+Download and run `pre-booster`, specifying the IP address you want the booster to use.
+
+```bash
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
 chmod +x pre-booster
 ./pre-booster -i 192.168.100.4 -y
 ```
 
-Or plug the WAN port into a LAN port on the main modem, the same way a shop booster is wired in at first. This waits until that modem gives the WAN port an address, then saves a free address on that network. The WAN session stays up.
+Depending on your existing network configuration, you may need to reconnect your LAN or WAN cables before accessing the booster at its new address.
 
-```sh
+**Option 2: Configure using the main modem (recommended)**
+
+Connect the booster's WAN port to a LAN port on your main modem using an Ethernet cable.
+
+This method allows `pre-booster` to obtain network information from the main modem through DHCP before configuring the booster with an available IP address.
+
+```bash
 ./pre-booster -w -i 192.168.100.4 -y
 ```
 
-`-i`, `-w`, and `-y` are listed under Installer options. Open `http://192.168.100.4/` and confirm the page loads. With `-w`, that page is reachable after the next install, on the same cable. Then install:
+The WAN connection remains active throughout the installation, allowing you to continue accessing the booster over the Ethernet cable.
 
-```sh
+Once complete, open the booster's new address in your browser:
+
+`http://192.168.100.4/`
+
+Confirm that the web interface loads before proceeding.
+
+For more information about `-i`, `-w` and `-y`, refer to the **Installer options** section below.
+
+### Step 2: Install Wi-Fi Backhaul
+
+Once `pre-booster` has completed successfully, download and run the main Wi-Fi Backhaul installer.
+
+```bash
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
 ./wifi-backhaul -y
 ```
 
-The installer keeps the address `pre-booster` already set and restarts services. It turns off unused services, including WPS and UPnP, and removes them from the cards. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
+The installer retains the IP address configured by `pre-booster` and makes the necessary changes to prepare the device for wireless backhaul operation.
 
-Once the script has run, the WAN port is a LAN port. Leave the cable in place if it runs to the main modem. Open the new address, such as `http://192.168.100.4/`, and connect the Wi-Fi backhaul. When that link is up, unplug the cable and move the booster.
+During installation, the script will:
+
+- Disable unnecessary services, including WPS and UPnP.
+- Remove unused service cards from the web interface.
+- Reconfigure the WAN port to function as an additional LAN port.
+- Restart the necessary network services.
+- Temporarily configure a small subnet with DHCP enabled, providing two addresses for local access (one for Ethernet and one for Wi-Fi).
+
+**Important:** Your connection to the booster may temporarily drop while these changes are applied. Allow a couple of minutes for the network services to restart.
+
+Once a Wi-Fi backhaul connection has been successfully established, the booster automatically restores the `/24` subnet and disables its DHCP server, allowing the main modem to manage IP address allocation.
+
+### Step 3: Connect the Wi-Fi backhaul
+
+After installation, open the booster's web interface using the IP address configured earlier.
+
+For example:
+
+`http://192.168.100.4/`
+
+Locate the **Wi-Fi Backhaul** card and select the wireless network you want the booster to connect to.
+
+Enter the network password and establish the connection.
+
+Once the wireless backhaul is connected and working:
+
+1. Confirm that the booster can communicate with the main modem.
+2. Disconnect the Ethernet cable connecting the booster to the main modem.
+3. Move the booster to its intended location.
+4. Reconnect to the booster's web interface to confirm that the wireless backhaul is still operational.
+
+Your rooted Telstra DJA0231 should now be operating as a wireless booster, using Wi-Fi for its connection to the main modem while providing its own 2.4 GHz and 5 GHz wireless networks for nearby devices.
 
 ## Fresh setup
 

@@ -451,29 +451,67 @@ You do not need to manually enter the hidden network's password.
 
 ## Update an existing booster
 
-```sh
+Wi-Fi Backhaul can be updated without losing your existing network configuration.
+
+To download and install the latest version, run:
+
+```bash
 ./wifi-backhaul -U -y
 ```
 
-This downloads the latest installer and applies it. The upstream Wi-Fi, the saved radio lock, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. The backhaul link stays up. Refresh the browser when it finishes.
+The `-U` option downloads the latest installer and applies the update while preserving:
 
-The first time this command is used, download the installer and then update:
+- The upstream Wi-Fi network and saved credentials.
+- The saved wireless radio lock.
+- The backhaul IP address.
+- The booster's LAN IP address.
+- The configured USB backup schedule.
 
-```sh
+The wireless backhaul connection remains active during the update.
+
+Once complete, refresh your browser to load the updated web interface.
+
+### First-time update
+
+If you haven't previously downloaded the installer, run:
+
+```bash
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
 ./wifi-backhaul -U -y
 ```
 
-After that, `/root/wifi-backhaul -U -y` downloads and applies a newer copy.
+For future updates, you can simply run:
 
-## Keeping the pages after an unhide upgrade
+```bash
+/root/wifi-backhaul -U -y
+```
 
-```sh
+This automatically downloads and applies the latest version from GitHub.
+
+## Keeping the pages after a tch-gui-unhide upgrade
+
+If you're updating tch-gui-unhide, use:
+
+```bash
 ./tch-gui-unhide -U -y
 ```
 
-That upgrade rewrites the web pages, then puts the booster pages back. Content Sharing, Mobile, Printer Sharing, Parental Controls, and Relay Setup stay removed. The upgrade no longer prints `No such file or directory` for those cards. If you run the tch-gui-unhide `get` command again and it replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -U -y` once more so later upgrades keep the pages.
+This updates the Technicolor web interface while restoring the Wi-Fi Backhaul modifications and keeping the booster-specific pages available.
+
+Unnecessary dashboard cards remain removed, including Content Sharing, Mobile, Printer Sharing, Parental Controls and Relay Setup.
+
+The update also suppresses `No such file or directory` messages associated with these removed cards.
+
+**Important:** If you reinstall tch-gui-unhide using its original `get` installer, the contents of `/root/tch-gui-unhide` may be replaced.
+
+If this happens, run:
+
+```bash
+./wifi-backhaul -U -y
+```
+
+This reapplies the Wi-Fi Backhaul modifications and ensures they are retained during future tch-gui-unhide upgrades.
 
 ## What the booster does
 

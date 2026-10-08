@@ -709,7 +709,6 @@ Standard installation:
 | `-bs` | Combines `-b` and `-s`, enabling the Wi-Fi Booster card, copying Wi-Fi settings once and attempting to connect to the hidden backhaul network. |
 | `-bS` | Combines hidden backhaul functionality with automatic hourly Wi-Fi synchronisation. |
 | `-y` | Automatically confirms installer prompts. |
-| `-n` | Accepted by the installer. |
 | `-t` | Checks the packaged files and exits without proceeding with installation. |
 
 ### Additional notes

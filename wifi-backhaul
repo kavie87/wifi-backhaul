@@ -36,7 +36,6 @@ Options:
  -s           Copy the upstream 2.4 and 5 GHz names once
  -S           Keep those names in step, and check again every hour
  -y           Skip the confirmation prompt
- -n           Accepted
  -t           Check the packaged files, then exit
 
 Example:

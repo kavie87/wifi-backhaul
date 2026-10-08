@@ -36,7 +36,7 @@ Options:
  -s           Copy the upstream 2.4 and 5 GHz names once
  -S           Keep those names in step, and check again every hour
  -y           Skip the confirmation prompt
- -n           Accepted. The install does not reboot anyway
+ -n           Accepted
  -t           Check the packaged files, then exit
 
 Example:
@@ -67,7 +67,7 @@ still needed is the hostname and domain name.
 
 -U downloads the latest installer, then applies it. The upstream Wi-Fi,
 the backhaul address, and this booster's LAN address stay as they are.
-It does not reboot. Refresh the browser when it finishes.
+Refresh the browser when it finishes.
 
 Run pre-booster after reset-to-factory-defaults-with-root, de-telstra,
 and tch-gui-unhide. Then run this installer.
@@ -20147,10 +20147,10 @@ if [ "$UPDATE" = y ]; then
   echo "  LAN address: $LAN_IP"
   if [ "$BOOSTER_CARD" = y ] && { [ "$SYNC_HOUR" = y ] || [ "$SYNC_ONCE" = y ]; }; then
     echo "  The local names are copied from the upstream modem."
-    echo -e "${ORANGE}It will not reboot. The backhaul then tries the hidden network.${NC}"
+    echo -e "${ORANGE}The backhaul then tries the hidden network.${NC}"
   else
     echo "  Saved upstream Wi-Fi and the backhaul address are kept."
-    echo -e "${ORANGE}It will not reboot, and the backhaul link stays up.${NC}"
+    echo -e "${ORANGE}The backhaul link stays up.${NC}"
   fi
   echo "Refresh the browser when this finishes."
   if [ "$BOOSTER_CARD" = y ]; then
@@ -20174,7 +20174,6 @@ else
   echo "  That address is already set and is kept."
   echo "  Upstream Wi-Fi is chosen afterwards in the Wi-Fi Backhaul card."
   echo "  A saved upstream network on this device is kept."
-  echo -e "${ORANGE}It restarts services and does not reboot.${NC}"
   echo "The connection may drop. Wait a couple of minutes for the network to come back up."
   echo "Open http://$LAN_IP/ when it finishes."
   echo "The WAN port becomes a LAN port. Leave that cable in place if it runs to the main modem."
@@ -20391,7 +20390,7 @@ elif [ "$UPDATE" != y ]; then
 fi
 if [ "$SYNC_HOUR" = y ]; then
   : > /root/dja-backhaul/sync-ssid
-elif [ "$SYNC_ONCE" = y ] || [ "$UPDATE" != y ]; then
+else
   rm -f /root/dja-backhaul/sync-ssid
 fi
 if [ "$BOOSTER_CARD" = y ] && { [ "$SYNC_HOUR" = y ] || [ "$SYNC_ONCE" = y ]; }; then
@@ -20497,7 +20496,7 @@ fi
 if [ -x /root/dja-backhaul/apply-link-flags ]; then
   /root/dja-backhaul/apply-link-flags || true
 fi
-if [ -f /root/dja-backhaul/sync-ssid ]; then
+if [ "$SYNC_HOUR" = y ]; then
   echo "Scheduled Tasks checks the 2.4 and 5 GHz names every hour."
   echo "Change that time under Management, Scheduled Tasks."
   echo "Band steering is turned on here when the main modem has it on."

@@ -20,7 +20,7 @@ A massive thank you to seud0nym and everyone in the Technicolor modding communit
 
 ## Download and install
 
-Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. This does not reboot. You may need to reconnect the LAN or WAN cables, then open the new address.
+Run `pre-booster` first. It moves the booster modem onto the same network as the main modem. Check that the LAN address is free before you use it. On a `192.168.100.0` network the main modem is `192.168.100.1`, so this booster needs another free address, such as `192.168.100.4`. You may need to reconnect the LAN or WAN cables, then open the new address.
 
 ```sh
 curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
@@ -42,7 +42,7 @@ chmod +x wifi-backhaul
 ./wifi-backhaul -y
 ```
 
-The installer keeps the address `pre-booster` already set, restarts services, and does not reboot. It turns off unused services, including WPS and UPnP, and removes them from the cards. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
+The installer keeps the address `pre-booster` already set and restarts services. It turns off unused services, including WPS and UPnP, and removes them from the cards. The connection may drop. Wait a couple of minutes for the network to come back up. It turns the WAN port into a LAN port and removes the unused service cards. As soon as it runs, this booster uses a small subnet and gives out two addresses, one for a LAN port and one for Wi-Fi. DHCP stays on until a Wi-Fi backhaul connects. Then the subnet returns to `/24` and DHCP turns off.
 
 Once the script has run, the WAN port is a LAN port. Leave the cable in place if it runs to the main modem. Open the new address, such as `http://192.168.100.4/`, and connect the Wi-Fi backhaul. When that link is up, unplug the cable and move the booster.
 
@@ -102,7 +102,7 @@ Running `./wifi-backhaul` again keeps an upstream network and a backhaul address
 
 ## How to use it
 
-A normal `./wifi-backhaul -y` does not copy Wi-Fi names and does not add the Wi-Fi Booster card. Internet comes from the visible Telstra network. On a booster that is already installed, add `-U` so the LAN address, saved networks, and backhaul address stay as they are. It does not reboot. Refresh the browser when it finishes.
+A normal `./wifi-backhaul -y` does not copy Wi-Fi names and does not add the Wi-Fi Booster card. Internet comes from the visible Telstra network. On a booster that is already installed, add `-U` so the LAN address, saved networks, and backhaul address stay as they are. Refresh the browser when it finishes.
 
 ### 1. Connect, and keep the password
 
@@ -136,7 +136,7 @@ The Access Point form has Mirror Main Wi-Fi SSID under Protected Management Fram
 
 The booster's 5 GHz radio stays on the same channel as the main modem, because the backhaul uses that radio. The 2.4 GHz network can use another channel. Use the main modem's spelling, such as `Telstra1B279D`, with no extra hyphen.
 
-`./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used. `./wifi-backhaul -U -s -y` copies once and turns the hourly copy off.
+`./wifi-backhaul -U -y` leaves the hourly copy off. `./wifi-backhaul -U -S -y` turns it on. `./wifi-backhaul -U -s -y` copies once.
 
 ### 3. Wi-Fi Booster card
 
@@ -206,7 +206,7 @@ The Wi-Fi Backhaul card then lists that network as Main backhaul. Connect uses t
 ./wifi-backhaul -U -y
 ```
 
-This downloads the latest installer and applies it. The upstream Wi-Fi, the saved radio lock, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. It does not reboot, and the backhaul link stays up. Refresh the browser when it finishes.
+This downloads the latest installer and applies it. The upstream Wi-Fi, the saved radio lock, the backhaul address, this booster's LAN address, and the USB backup time stay as they are. The backhaul link stays up. Refresh the browser when it finishes.
 
 The first time this command is used, download the installer and then update:
 
@@ -305,7 +305,7 @@ A USB stick has to be plugged in first. The card shows whether one is inserted.
 | `-w` | Wired start. Plug the WAN port into a LAN port on the main modem. Waits until that modem gives the WAN port an address, checks the `-i` address is free and on that network, then saves it. The WAN session stays up |
 | `-y` | Do not ask for confirmation |
 
-With no `-w`, `./pre-booster -i 192.168.100.4 -y` moves the LAN address and restarts the network. It does not reboot. DHCP stays on.
+With no `-w`, `./pre-booster -i 192.168.100.4 -y` moves the LAN address and restarts the network. DHCP stays on.
 
 After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable opens the new address. Connect the Wi-Fi backhaul there. When that link is up, unplug the cable and move the booster.
 
@@ -318,12 +318,12 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | Option | Effect |
 | --- | --- |
 | `-i` | Not required. `pre-booster` has already set the address |
-| `-U` | Update an existing booster and keep its saved settings. Does not reboot |
+| `-U` | Update an existing booster and keep its saved settings |
 | `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
 | `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios once, and turn band steering on here when that modem has it on. If the main modem is not connected, nothing is changed. The backhaul stays on the network already saved |
-| `-S` | Do that copy, then check again every hour. The job is under Management, Scheduled Tasks, starting at once an hour. Change the time there. `./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used |
+| `-S` | Do that copy, then check again every hour. The job is under Management, Scheduled Tasks, starting at once an hour. Change the time there. The hourly copy runs only when this command includes `-S` |
 | `-y` | Do not ask for confirmation |
-| `-n` | Accepted. A new install does not reboot |
+| `-n` | Accepted |
 | `-t` | Check the packaged files and exit |
 
 The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. Copy on the Access Point form does that too. `-S` keeps checking every hour from Scheduled Tasks, and the time can be changed there. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.

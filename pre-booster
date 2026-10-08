@@ -36,7 +36,7 @@ Options:
 Check that the LAN address is free. On a 192.168.100.0 network the main
 modem is 192.168.100.1, so this booster needs another free address.
 
-Without -w, this restarts the network and DHCP. It does not reboot.
+Without -w, this restarts the network and DHCP.
 DHCP stays on so a computer can pick up an address on the new network.
 You may need to reconnect the LAN or WAN cables.
 

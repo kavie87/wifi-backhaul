@@ -723,48 +723,107 @@ For detailed instructions and examples of each configuration option, refer to th
 
 ### restore-fresh-root
 
-```text
+The `restore-fresh-root` script removes Wi-Fi Backhaul and returns the modem to a clean, freshly rooted configuration while preserving root access.
+
+This is useful if you want to repurpose the modem, start again or remove Wi-Fi Backhaul entirely.
+
+**Available commands:**
+
+```bash
 ./restore-fresh-root -y
 ./restore-fresh-root -I 192.168.100.2 -y
 ```
 
-| Option | Effect |
-| --- | --- |
-| `-I` | LAN address after the reset. `./restore-fresh-root -y` leaves this off and uses the factory LAN address |
-| `-i` | Keep the LAN address this booster has now. Do not use this with `-I` |
-| `-y` | Do not ask for confirmation |
+| Option | Description |
+|---|---|
+| `-I` | Sets a specific LAN IP address after the reset. If omitted, the factory LAN address is used unless `-i` is specified. |
+| `-i` | Preserves the booster's current LAN IP address. Cannot be used together with `-I`. |
+| `-y` | Automatically confirms prompts without asking for confirmation. |
+
+For detailed instructions, refer to the **Put the booster back** section below.
 
 ## Put the booster back
 
-`restore-fresh-root` removes the Wi-Fi booster and returns the modem to a freshly rooted setup, the same path as the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki). The root password is set back to `root`. The upstream network and the booster pages are not kept. This is not the USB backup restore. That restore puts the booster setup back.
+If you no longer want to use your Telstra DJA0231 as a wireless booster, `restore-fresh-root` can return it to a clean, freshly rooted configuration.
 
-`./wifi-backhaul` installs `restore-fresh-root` in `/root`. From that prompt, run `./restore-fresh-root`. The same command also works without `./`.
+The process follows the same general approach documented in the [tch-gui-unhide wiki](https://github.com/seud0nym/tch-gui-unhide/wiki).
 
-### `./restore-fresh-root -y`
+**Important:** This process removes the Wi-Fi Backhaul configuration, including saved upstream networks and booster-specific web interface modifications.
 
-This does the three steps and returns the modem on its factory LAN address:
+Root access is preserved, but the root password is reset to `root`. **You should change this password immediately after restoring the modem.**
 
-1. Copy the reset script to `/tmp` and run it from there. That keeps root and the current SSH key, and turns CWMP off for the first boot.
+This is not a return to completely stock Telstra firmware. The modem remains rooted, with `de-telstra` and a clean installation of `tch-gui-unhide`.
 
-```sh
+This process is also different from **USB Backup**, which restores a previously saved booster configuration.
+
+### Running restore-fresh-root
+
+The Wi-Fi Backhaul installer automatically installs `restore-fresh-root` in `/root`.
+
+Connect to the booster using SSH and run the script from that directory.
+
+**You do not need to manually reset the modem first.** The script handles the factory reset, network configuration and reinstallation of the required Technicolor modifications automatically.
+
+### Option 1: Restore using the factory LAN address
+
+To remove Wi-Fi Backhaul and return the modem to its factory LAN address, run:
+
+```bash
+./restore-fresh-root -y
+```
+
+The script automatically performs three steps:
+
+1. **Reset the modem while preserving root access.** Copies `reset-to-factory-defaults-with-root` to `/tmp` and runs it from there, retaining root access and the existing SSH key while disabling CWMP for the first boot.
+2. **Apply de-telstra.** Runs `./de-telstra -A` to remove unnecessary Telstra-specific configuration.
+3. **Reapply tch-gui-unhide.** Installs a clean web interface without the Wi-Fi Backhaul modifications or booster-specific pages.
+
+For reference, the factory reset stage uses these commands internally:
+
+```bash
 cp -p reset-to-factory-defaults-with-root /tmp
 cd /tmp
 sh reset-to-factory-defaults-with-root -c -y
 ```
 
-2. `./de-telstra -A`
-3. A clean `./tch-gui-unhide`, without the booster pages.
+**Do not run these commands separately.** They are included here for reference only, as `restore-fresh-root` handles the entire process.
 
-```sh
-./restore-fresh-root -y
-```
+### Option 2: Restore using a custom LAN address
 
-### `./restore-fresh-root -I 192.168.100.2 -y`
+If you prefer to assign a specific LAN IP address after the reset, use the `-I` option.
 
-This does the same reset, then brings the modem back on the address passed with `-I`.
+For example:
 
-```sh
+```bash
 ./restore-fresh-root -I 192.168.100.2 -y
 ```
 
-After the reboot it is a normal modem again. Plug a computer into a LAN port and open that address. If a USB stick is already inserted, the script copies `de-telstra` and a clean unhide onto it and uses those after the reboot. With no USB stick, plug the WAN port into the main modem so those two scripts can download. The result is written to `/root/fresh-root.log`.
+This performs the same restoration process but configures the modem to use `192.168.100.2` instead of its factory LAN address.
+
+Alternatively, use `-i` to preserve the booster's existing LAN IP address.
+
+### After the restoration
+
+Once the process has completed and the modem has rebooted:
+
+1. Connect a computer to one of the modem's LAN ports using an Ethernet cable.
+2. Open the modem's IP address in your web browser.
+3. Confirm that the standard web interface is accessible.
+4. **Change the default root password from `root` to a strong, unique password.**
+
+The modem will no longer operate as a Wi-Fi booster. Its saved upstream networks and Wi-Fi Backhaul pages will have been removed.
+
+However, root access remains available, allowing you to continue modifying the device or repurpose it for another project.
+
+### USB and internet requirements
+
+The restoration process requires access to `de-telstra` and a clean copy of `tch-gui-unhide`.
+
+- **With a USB drive connected:** The script copies the required files to the USB drive before resetting and uses them after the reboot.
+- **Without a USB drive:** Connect the modem's WAN port to a LAN port on your main modem so the required scripts can be downloaded after the reset.
+
+A log of the restoration process is saved to:
+
+`/root/fresh-root.log`
+
+This log can help identify any issues encountered during restoration.

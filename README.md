@@ -6,17 +6,15 @@ The upstream network name and password are not in this download. After the boost
 
 ## Acknowledgements
 
-A huge thank you to [seud0nym/tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide) for the assistance he has offered me over the years and the wider Technicolor modding community for the work that makes projects like this possible.
+A huge thank you to [seud0nym](https://github.com/seud0nym/tch-gui-unhide) for the assistance and guidance he has generously provided me over the years, and to the wider Technicolor modding community for the work that makes projects like this possible.
 
-The ability to root and unlock these devices is built on the work of others who have spent considerable time researching, documenting and developing tools for Technicolor hardware.
+The ability to root, unlock and modify these devices is thanks to the countless hours others have spent researching, documenting and developing tools for Technicolor hardware.
 
-This project does not attempt to replace or take credit for that work. Instead, it builds on that foundation by exploring another use for rooted Telstra Gen 2 hardware — in this case, making it easier to repurpose a spare device as a wireless backhaul/booster.
+This project builds on that work by exploring another practical use for rooted Telstra Gen 2 hardware — repurposing a spare device as a wireless booster using Wi-Fi backhaul. It is not intended to replace or take credit for the work that made these modifications possible.
 
-Without the work of projects such as [tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide), this project simply wouldn't exist.
+Without projects such as [tch-gui-unhide](https://github.com/seud0nym/tch-gui-unhide), this project simply wouldn't exist.
 
-If you're new to rooting or modifying these devices, be sure to visit [seud0nym's GitHub repository](https://github.com/seud0nym/tch-gui-unhide) to learn more about the rooting/unlocking process and the work that has gone into making these devices accessible for further modification.
-
-A massive thank you to seud0nym and everyone in the Technicolor modding community who has contributed their time, knowledge and discoveries over the years.
+If you're new to rooting or modifying these devices, I strongly encourage you to visit [seud0nym's GitHub repository](https://github.com/seud0nym/tch-gui-unhide) to learn more about the rooting and unlocking process, as well as the work that has gone into making these devices accessible for further modification.
 
 ## Download and install
 

@@ -105,59 +105,95 @@ Once the wireless backhaul is connected and working:
 
 Your rooted Telstra DJA0231 should now be operating as a wireless booster, using Wi-Fi for its connection to the main modem while providing its own 2.4 GHz and 5 GHz wireless networks for nearby devices.
 
-## Fresh setup
+## Fresh setup (optional)
 
-```sh
+If you're starting with a freshly rooted Telstra DJA0231 or want to begin with a clean configuration, the following steps will prepare the modem for Wi-Fi Backhaul.
+
+**Important:** These steps are intended for an already rooted device. Do not perform a factory reset unless you are confident your firmware supports retaining root access.
+
+### Step 1: Reset to factory defaults (optional)
+
+If you want to start with a clean configuration while retaining root access, run:
+
+```bash
 cp -p reset-to-factory-defaults-with-root /tmp
 cd /tmp
 sh reset-to-factory-defaults-with-root -c -y
 ```
 
-```sh
-curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh -s --
+This resets the modem's configuration while preserving root access.
+
+### Step 2: Install Technicolor modifications
+
+Download and run the `tch-gui-unhide` installer developed by [seud0nym](https://github.com/seud0nym/tch-gui-unhide):
+
+```bash
+curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh
+```
+
+Once installed, run:
+
+```bash
 ./de-telstra -A -y
 ./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
 ```
 
-`./de-telstra -A` sets the hostname to the modem model and the domain name to `gateway`. It also turns off WPS, UPnP, sharing, and NAT helpers. `./wifi-backhaul -y` removes those from the cards. It does not change EasyMesh or DumaOS. To choose the hostname and domain name yourself, replace `DJA0231-Booster` in this example with the name you want, then run:
+These commands remove unnecessary Telstra-specific settings and configure the web interface for use with Wi-Fi Backhaul.
 
-```sh
+**What does `de-telstra -A` do?**
+
+The `-A` option applies several changes, including:
+
+- Setting the hostname to the modem model.
+- Setting the domain name to `gateway`.
+- Disabling WPS and UPnP.
+- Disabling sharing services and NAT helpers.
+
+Wi-Fi Backhaul also removes unused services from the web interface during installation.
+
+These changes do not modify EasyMesh or DumaOS.
+
+**Optional: Customise the hostname**
+
+If you'd prefer to give your booster a custom hostname and domain name, run:
+
+```bash
 ./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
 ```
 
-`./tch-gui-unhide -Cs` shows the one summary chart card and hides CPU, RAM, Backhaul Download, and Backhaul Upload. `./wifi-backhaul` leaves that summary card in place. A fresh install that did not use `-Cs` still shows those four cards. `-tc` uses the classic theme. `-hn` sets the browser title to the hostname. `-dy` allows the page without a password. `-a5` shows five cards across.
+Replace `DJA0231-Booster` with your preferred name.
 
-Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
+### Step 3: Customise the web interface
 
-```sh
-curl -skLo pre-booster https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/pre-booster
-chmod +x pre-booster
-./pre-booster -i 192.168.100.4 -y
-```
+The `tch-gui-unhide` command above includes several options to simplify the web interface.
 
-`./pre-booster -w` is the wired start, the same way a shop booster is plugged in at first. Plug the WAN port into a LAN port on the main modem. The script waits until that modem gives the WAN port an address, checks the address you chose is free and on that network, and saves it. The WAN session stays up, so this SSH connection is not dropped.
+| Option | Description |
+|---|---|
+| `-hn` | Sets the browser title to the modem's hostname. |
+| `-dy` | Allows access to the web interface without a password. |
+| `-Cs` | Displays a single summary chart instead of separate CPU, RAM, Backhaul Download and Backhaul Upload cards. |
+| `-tc` | Enables the classic theme. |
+| `-a5` | Displays five cards across the web interface. |
+| `-y` | Automatically confirms prompts. |
 
-```sh
-./pre-booster -w -i 192.168.100.4 -y
-```
+The Wi-Fi Backhaul installer preserves the summary chart configuration. If `-Cs` was not used, the individual monitoring cards will remain visible.
 
-`-i`, `-w`, and `-y` are listed under Installer options. Open `http://192.168.100.4/` and confirm the page loads. Then:
+**Security note:** The `-dy` option disables password protection for the web interface. Only use this on a trusted network.
 
-```sh
-curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
-chmod +x wifi-backhaul
-./wifi-backhaul -y
-```
+### Step 4: Install Wi-Fi Backhaul
 
-The connection may drop. Wait a couple of minutes for the network to come back up. When it finishes:
+With the modem reset and the Technicolor modifications installed, you're ready to configure Wi-Fi Backhaul.
 
-1. The WAN port is now a LAN port. Leave the cable in place if it runs to the main modem.
-2. Open the new address, `http://192.168.100.4/`.
-3. From that page, open the Wi-Fi Backhaul card and connect the Wi-Fi backhaul.
-4. When that link is up, unplug the cable and move the booster.
-5. The backhaul address starts on DHCP. Set a static address in that same card if you want one.
+Follow the instructions in the **Download and install** section above to:
 
-Running `./wifi-backhaul` again keeps an upstream network and a backhaul address that are already saved.
+1. Run `pre-booster` and assign the booster an available IP address on your main network.
+2. Install the `wifi-backhaul` script.
+3. Open the Wi-Fi Backhaul card and connect to your main modem's wireless network.
+4. Confirm the wireless connection is working before disconnecting the Ethernet cable and relocating the booster.
+
+The backhaul connection uses DHCP by default. If you prefer a static IP address, this can be configured directly through the Wi-Fi Backhaul card.
+
+**Re-running the installer:** Running `./wifi-backhaul` again preserves any previously saved upstream Wi-Fi network and backhaul IP configuration.
 
 ## How to use it
 

@@ -114,19 +114,27 @@ The network in Current Backhaul has Disconnect and Forget Network while it is co
 
 ### 2. Use the same Wi-Fi names as the main modem
 
-Wait until the backhaul is connected to the visible network, then:
+`-s` copies once. `-S` keeps copying every hour.
+
+Wait until the backhaul is connected to the visible network, then either:
 
 ```sh
 ./wifi-backhaul -U -s -y
 ```
 
-This copies that modem's 2.4 GHz name and password, and its 5 GHz name and password, onto this booster's own client radios. If that modem has band steering on, this booster turns band steering on and uses the same name on both bands. Guest networks are left as they are. The backhaul stays on the network already chosen.
+or:
 
-The copy runs again every hour. If the main modem's names or band steering have changed, this booster follows. The Wi-Fi page shows Mirror main Wi-Fi SSID as On. Nothing is rewritten when the names already match.
+```sh
+./wifi-backhaul -U -S -y
+```
+
+`-s` copies that modem's 2.4 GHz name and password, and its 5 GHz name and password, onto this booster's own client radios. If that modem has band steering on, this booster turns band steering on and uses the same name on both bands. Guest networks are left as they are. The backhaul stays on the network already chosen. If the main modem is not connected, nothing is changed. Run `-s` again when that link is up.
+
+`-S` does that copy, then checks again every hour. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match. The Wi-Fi page shows Mirror Main Wi-Fi SSID as On as soon as `./wifi-backhaul -S` finishes, including when the main modem is not connected yet. The names are copied when that link is up.
 
 The booster's 5 GHz radio stays on the same channel as the main modem, because the backhaul uses that radio. The 2.4 GHz network can use another channel. Use the main modem's spelling, such as `Telstra1B279D`, with no extra hyphen.
 
-If the link is not up yet, the installer waits and copies the names the next time it connects. `./wifi-backhaul -U -y` keeps the hourly copy. `./wifi-backhaul -y` without `-s` turns it off.
+`./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used. `./wifi-backhaul -U -s -y` copies once and turns the hourly copy off.
 
 ### 3. Wi-Fi Booster card
 
@@ -152,7 +160,7 @@ The backhaul uses the main modem's 5 GHz channel. If that join drops the interne
 ./wifi-backhaul -U -bs -y
 ```
 
-`-bs` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords, follows that modem's band steering, and then points the backhaul at the hidden network. The name copy keeps checking every hour. Connect to the visible Telstra network first, so it can read that network's name, password, and beacon address.
+`-bs` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords once, follows that modem's band steering, and then points the backhaul at the hidden network. `-bS` does the same and keeps checking the names every hour. Connect to the visible Telstra network first, so it can read that network's name, password, and beacon address.
 
 If the beacon is not in the scan yet, the switch waits. If the internet drops, Forget that network in Wi-Fi Backhaul and join the visible Telstra network again. Type that password again if the saved one was replaced.
 
@@ -309,12 +317,13 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | `-i` | Not required. `pre-booster` has already set the address |
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
-| `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios, and turn band steering on here when that modem has it on. The copy is checked again every hour. The Wi-Fi card shows Mirror main Wi-Fi SSID. The backhaul stays on the network already saved. `./wifi-backhaul -U -y` keeps this hourly copy if `-s` was already used |
+| `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios once, and turn band steering on here when that modem has it on. If the main modem is not connected, nothing is changed. The backhaul stays on the network already saved |
+| `-S` | Do that copy, then check again every hour. The Wi-Fi page shows Mirror Main Wi-Fi SSID On as soon as this finishes. `./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
 
-The order for `-s`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords, follows that modem's band steering, and checks again every hour. The Wi-Fi card shows Mirror main Wi-Fi SSID. The backhaul stays on the visible network. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` does both, then aims the backhaul at that hidden network. It uses the same 5 GHz channel as the visible Telstra network.
+The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. `-S` keeps checking every hour, and the Wi-Fi page shows Mirror Main Wi-Fi SSID On as soon as the installer finishes. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
 
 ### restore-fresh-root
 

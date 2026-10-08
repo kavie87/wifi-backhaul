@@ -411,21 +411,43 @@ This restores the Wi-Fi Backhaul modifications without resetting your saved netw
 
 ## Read the hidden network on the main modem
 
-On the main modem, `./main-backhaul` reads the backhaul radio, that radio's password, and the address the radio transmits. Copy the files across and the Wi-Fi Backhaul card can connect with them:
+If you prefer to retrieve the hidden backhaul network details directly from your main Telstra modem, you can use the `main-backhaul` script.
 
-```sh
+This script collects the hidden backhaul network name (SSID), password and beacon address (BSSID) required for the booster to establish a connection.
+
+### Step 1: Run the script on the main modem
+
+Connect to your rooted main Telstra modem using SSH, then download and run:
+
+```bash
 curl -skLo main-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/main-backhaul
 chmod +x main-backhaul
 ./main-backhaul
 ```
 
-Copy `/tmp/dja-main-backhaul` to the booster. The password file is included and is not printed. On the booster:
+The script saves the collected information to `/tmp/dja-main-backhaul`.
 
-```sh
+For security, the backhaul password is saved to a file rather than displayed in the terminal.
+
+### Step 2: Transfer the files to the booster
+
+Copy the `/tmp/dja-main-backhaul` directory from the main modem to your booster, including the password file.
+
+Once the files have been transferred, run the following command on the booster:
+
+```bash
 ./take-main-backhaul /tmp/dja-main-backhaul
 ```
 
-The Wi-Fi Backhaul card then lists that network as Main backhaul. Connect uses the saved password, so it is not typed into the page.
+### Step 3: Connect to the hidden backhaul
+
+Open the booster's web interface and navigate to the Wi-Fi Backhaul card.
+
+The imported network will appear as **Main backhaul**.
+
+Select **Connect** to establish the wireless backhaul connection using the saved credentials.
+
+You do not need to manually enter the hidden network's password.
 
 ## Update an existing booster
 

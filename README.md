@@ -66,7 +66,7 @@ curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get |
 ./de-telstra -h DJA0231-Booster -d DJA0231-Booster -y
 ```
 
-`./tch-gui-unhide -Cs` shows the one summary chart card. A later `./wifi-backhaul -y` shows CPU, RAM, Backhaul Download, and Backhaul Upload instead. Run `./tch-gui-unhide -Cs` again after that install if you want the summary card back. `-tc` uses the classic theme. `-hn` sets the browser title to the hostname. `-dy` allows the page without a password. `-a5` shows five cards across.
+`./tch-gui-unhide -Cs` shows the one summary chart card and hides CPU, RAM, Backhaul Download, and Backhaul Upload. `./wifi-backhaul` leaves that summary card in place. A fresh install that did not use `-Cs` still shows those four cards. `-tc` uses the classic theme. `-hn` sets the browser title to the hostname. `-dy` allows the page without a password. `-a5` shows five cards across.
 
 Move the booster modem onto the same network as the main modem. Check that the LAN address is free first. You may need to reconnect the LAN or WAN cables.
 
@@ -130,7 +130,9 @@ or:
 
 `-s` copies that modem's 2.4 GHz name and password, and its 5 GHz name and password, onto this booster's own client radios. If that modem has band steering on, this booster turns band steering on and uses the same name on both bands. Guest networks are left as they are. The backhaul stays on the network already chosen. If the main modem is not connected, nothing is changed. Run `-s` again when that link is up.
 
-`-S` does that copy, then checks again every hour. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match. The Wi-Fi page shows Mirror Main Wi-Fi SSID as On as soon as `./wifi-backhaul -S` finishes, including when the main modem is not connected yet. The names are copied when that link is up.
+`-S` does that copy, then checks again every hour. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match. The job is listed under Management, Scheduled Tasks. It starts at once an hour. Change the minute, hour, day, month, or weekday there, and the next check uses that time. Deleting that task stops the hourly check.
+
+The Access Point form has Mirror Main Wi-Fi SSID under Protected Management Frames. Copy does the same once-only copy as `-s`. If the main modem is not connected, nothing is changed.
 
 The booster's 5 GHz radio stays on the same channel as the main modem, because the backhaul uses that radio. The 2.4 GHz network can use another channel. Use the main modem's spelling, such as `Telstra1B279D`, with no extra hyphen.
 
@@ -240,7 +242,7 @@ The booster stays on the main modem's LAN. One 5 GHz interface is only the link 
 The basic Home view is the network map.
 
 - Joining lines run from the booster to Wi-Fi, Ethernet, and USB, in the same layout as the main modem.
-- The USB column lists a plugged-in stick: product name, manufacturer, and port.
+- The USB column lists a plugged-in stick: product name, manufacturer, and port. The internal LTE-A module is not listed.
 - DECT is not shown.
 - The Wi-Fi details on the left are the local networks, not the upstream network.
 
@@ -249,7 +251,7 @@ The basic Home view is the network map.
 The Advanced dashboard keeps the cards that matter on a booster.
 
 - Broadband is not shown. Mobile, DNS, Firewall, xDSL, NAT Helpers, and Relay Setup are removed, including from Management. Mobile is disabled.
-- Eco Settings, Diagnostics, Packages, System Extras, and Devices are hidden. Management can turn those cards on.
+- Eco Settings, Diagnostics, Packages, System Extras, and Devices are hidden. Management can turn those cards on. Device Security is removed.
 - Management has one Wi-Fi Backhaul switch. That switch opens the backhaul card.
 - Internet Access shows the upstream network, signal, and rate. Backhaul download and upload sit in the corner of that card.
 - Wi-Fi Backhaul shows the upstream name, signal, rate, channel, width, and uptime. The password is the one on the main modem. The network name is not accepted as the password. The scan list is titled Available Networks, and its columns line up with Current Backhaul. A network this booster has joined stays in that list as Saved, with Reconnect and Forget Network, and its password is kept when another network is chosen. A connected network offers Disconnect and Forget Network. Disconnect keeps the saved network and then offers Reconnect and Forget Network. Forget Network deletes that saved network. Connecting to a network saves a lock to the radio it joined. Disconnect drops that lock. A different network drops the old lock and saves the new radio after it connects. Reconnect saves the radio it joins.
@@ -260,7 +262,7 @@ The Advanced dashboard keeps the cards that matter on a booster.
 - Management is where card names are shown and cards are switched on or off. The backup card is labelled USB.
 - Diagnostics no longer has a TCP Dump tab.
 
-CPU, RAM, Backhaul Download, and Backhaul Upload are shown. `./tch-gui-unhide -Cs` replaces those four with the summary chart card.
+CPU, RAM, Backhaul Download, and Backhaul Upload are shown when `./tch-gui-unhide -Cs` was not used. `-Cs` replaces those four with the summary chart card, and `./wifi-backhaul` leaves them hidden.
 
 ## Local Network page
 
@@ -272,6 +274,7 @@ CPU, RAM, Backhaul Download, and Backhaul Upload are shown. `./tch-gui-unhide -C
 ## Wi-Fi page
 
 - The tabs are the local 2.4 GHz and local 5 GHz networks.
+- Under Protected Management Frames, Mirror Main Wi-Fi SSID has Copy. Copy takes the main modem's names once. If that modem is not connected, nothing is changed.
 - Guest names are not listed.
 - Wireless Control and Wifi Nurse are not listed.
 - Changing the local name or password is not applied to the backhaul interface.
@@ -318,12 +321,12 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | `-U` | Update an existing booster and keep its saved settings. Does not reboot |
 | `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
 | `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios once, and turn band steering on here when that modem has it on. If the main modem is not connected, nothing is changed. The backhaul stays on the network already saved |
-| `-S` | Do that copy, then check again every hour. The Wi-Fi page shows Mirror Main Wi-Fi SSID On as soon as this finishes. `./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used |
+| `-S` | Do that copy, then check again every hour. The job is under Management, Scheduled Tasks, starting at once an hour. Change the time there. `./wifi-backhaul -U -y` keeps the hourly copy if `-S` was already used |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted. A new install does not reboot |
 | `-t` | Check the packaged files and exit |
 
-The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. `-S` keeps checking every hour, and the Wi-Fi page shows Mirror Main Wi-Fi SSID On as soon as the installer finishes. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
+The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. Copy on the Access Point form does that too. `-S` keeps checking every hour from Scheduled Tasks, and the time can be changed there. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
 
 ### restore-fresh-root
 

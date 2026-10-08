@@ -197,93 +197,217 @@ The backhaul connection uses DHCP by default. If you prefer a static IP address,
 
 ## How to use it
 
-A normal `./wifi-backhaul -y` does not copy Wi-Fi names and does not add the Wi-Fi Booster card. Internet comes from the visible Telstra network. On a booster that is already installed, add `-U` so the LAN address, saved networks, and backhaul address stay as they are. Refresh the browser when it finishes.
+By default, running `./wifi-backhaul -y` configures the booster to connect to a visible Wi-Fi network. It does not automatically copy the main modem's Wi-Fi settings or enable the optional Wi-Fi Booster card.
 
-### 1. Connect, and keep the password
+Additional options are available if you want to mirror your main modem's Wi-Fi settings or connect directly to its hidden backhaul network.
 
-Open Wi-Fi Backhaul, press Scan, and connect to the visible Telstra network. Type the password from the main modem. The network name is not the password.
+**Important:** If Wi-Fi Backhaul is already installed, include `-U` when running the installer again. This preserves the booster's LAN IP address, saved Wi-Fi networks and backhaul IP configuration.
 
-When that link is up, the name is saved. If you join a different network later, the earlier one stays in Available Networks. A saved row says Saved and has Reconnect and Forget Network. Reconnect uses the stored password. Forget Network removes that saved network. Disconnect keeps it, and the row then offers Reconnect.
+Refresh your browser after making changes.
 
-The network in Current Backhaul has Disconnect and Forget Network while it is connected.
+### 1. Connect to your main modem
 
-### 2. Use the same Wi-Fi names as the main modem
+Open the Wi-Fi Backhaul card in the booster's web interface.
 
-`-s` copies once. `-S` keeps copying every hour.
+Click **Scan** to discover available wireless networks.
 
-Wait until the backhaul is connected to the visible network, then either:
+Select your main modem's visible Wi-Fi network (for example, `Telstra1B279D`).
 
-```sh
+Enter the Wi-Fi password configured on your main modem.
+
+Connect and wait for the wireless backhaul to establish a connection.
+
+**Note:** The Wi-Fi network name (SSID) and password are different. Make sure you enter the actual Wi-Fi password.
+
+#### Managing saved networks
+
+Once connected, Wi-Fi Backhaul remembers the network name and password, making it easier to reconnect later.
+
+- **Reconnect:** Reconnects using the previously saved password.
+- **Disconnect:** Disconnects from the current network without deleting its saved details.
+- **Forget Network:** Removes the saved network and its password.
+
+Previously connected networks remain listed under Available Networks, even after connecting to another network.
+
+The active connection appears under Current Backhaul, where you can disconnect or forget it.
+
+### 2. Mirror your main modem's Wi-Fi settings
+
+Wi-Fi Backhaul can automatically copy your main modem's 2.4 GHz and 5 GHz Wi-Fi names and passwords to the booster's own wireless networks.
+
+This allows the booster to broadcast the same network names as your main modem, making it easier for devices to connect as you move around your home.
+
+Two options are available.
+
+#### Option A: Copy Wi-Fi settings once (`-s`)
+
+```bash
 ./wifi-backhaul -U -s -y
 ```
 
-or:
+Copies the main modem's Wi-Fi settings once. Run the command again whenever you want to update them.
 
-```sh
+#### Option B: Automatically synchronise Wi-Fi settings (`-S`)
+
+```bash
 ./wifi-backhaul -U -S -y
 ```
 
-`-s` copies that modem's 2.4 GHz name and password, and its 5 GHz name and password, onto this booster's own client radios. If that modem has band steering on, this booster turns band steering on and uses the same name on both bands. Guest networks are left as they are. The backhaul stays on the network already chosen. If the main modem is not connected, nothing is changed. Run `-s` again when that link is up.
+Copies the settings immediately and creates a scheduled task to check for changes every hour.
 
-`-S` does that copy, then keeps checking. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match.
+Both options:
 
-After `./wifi-backhaul -U -S -y`, open Management, Scheduled Tasks. The new row runs `/root/dja-backhaul/sync-upstream-ssid`. It starts once an hour. To run it every 6 hours, change that row to:
+- Copy the 2.4 GHz and 5 GHz SSIDs and passwords.
+- Enable band steering on the booster if it is enabled on the main modem, using the same SSID across both bands.
+- Leave guest Wi-Fi networks unchanged.
+- Preserve the existing wireless backhaul connection.
+- Make no changes if the main modem is not connected.
 
-| Minute | Hour | Day | Month | Weekday |
-| --- | --- | --- | --- | --- |
-| `0` | `*/6` | `*` | `*` | `*` |
+#### Automatic synchronisation
 
-Leave the command as it is. That runs at 12:00am, 6:00am, 12:00pm, and 6:00pm. The next `./wifi-backhaul -U -S -y` keeps the time you set. Turn Enabled off, or delete the row, to stop the check. `./wifi-backhaul -U -y` without `-S` removes the row.
+When using `-S`, the booster checks the main modem's Wi-Fi settings every hour.
 
-The Access Point form has Mirror Main Wi-Fi SSID under Protected Management Frames. Copy does the same once-only copy as `-s`. If the main modem is not connected, nothing is changed.
+If the SSIDs, passwords or band steering configuration have changed, the booster updates its settings to match. If everything already matches, no changes are made.
 
-The booster's 5 GHz radio stays on the same channel as the main modem, because the backhaul uses that radio. The 2.4 GHz network can use another channel. Use the main modem's spelling, such as `Telstra1B279D`, with no extra hyphen.
+You can view or modify this schedule under Management → Scheduled Tasks. The command is `/root/dja-backhaul/sync-upstream-ssid`. It starts once an hour. Set Hour to `*/6`, and leave Minute at `0`, to run every 6 hours (12:00am, 6:00am, 12:00pm and 6:00pm). Leave the command as it is. The next `./wifi-backhaul -U -S -y` keeps the time you set.
 
-`./wifi-backhaul -U -y` leaves the hourly copy off. `./wifi-backhaul -U -S -y` turns it on. `./wifi-backhaul -U -s -y` copies once.
+Deleting the task, or turning Enabled off, disables automatic synchronisation. `./wifi-backhaul -U -y` without `-S` removes the row.
 
-### 3. Wi-Fi Booster card
+#### Alternative: Copy through the web interface
 
-```sh
+You can also copy the settings directly from the Access Point configuration page.
+
+Under Protected Management Frames, locate **Mirror Main Wi-Fi SSID** and select **Copy**.
+
+This performs the same one-time synchronisation as `-s`.
+
+**Important notes:**
+
+- The wireless backhaul must already be connected to the main modem before copying settings.
+- The booster's 5 GHz radio must operate on the same channel as the main modem because it is also used for the wireless backhaul.
+- The 2.4 GHz radio can operate on a different channel.
+- SSIDs are copied exactly as configured on the main modem, without adding a suffix or additional characters.
+
+### 3. Enable the Wi-Fi Booster card
+
+Telstra Gen 2 modems also have a dedicated hidden wireless backhaul network used by compatible boosters.
+
+Wi-Fi Backhaul includes an optional Wi-Fi Booster card that can retrieve the information required to connect to this hidden network.
+
+To enable the card, run:
+
+```bash
 ./wifi-backhaul -U -b -y
 ```
 
-Refresh the page. The card is left out of a normal install. `./wifi-backhaul -U -y` keeps it if `-b` was already used.
+Refresh the web interface once the installer has finished.
 
-With the booster connected to the visible Telstra network, open the Wi-Fi Booster card and choose Collect main backhaul. The card reads three values and does not show the password:
+The card is not enabled during a standard installation. However, once enabled using `-b`, it remains available when running `./wifi-backhaul -U -y` again.
 
-1. The backhaul name, from the main modem's Wi-Fi Boosters page.
-2. The password for the hidden backhaul radio. The wireless page hides that radio, so this is not the visible network's password.
-3. The beacon address from the scan. The MAC on the wireless page belongs to the other radio. Saving that address makes the join fail.
+#### Connecting to the hidden backhaul network
 
-Wi-Fi Backhaul then lists it as Main backhaul. Connect uses the saved password and that beacon address. The same three values are what a working booster writes under `/root/dja-backhaul/`. Firmware `20.3.c.0389` has these pages.
+Before proceeding, connect the booster to your main modem's visible Telstra Wi-Fi network.
 
-The backhaul uses the main modem's 5 GHz channel. If that join drops the internet, use Forget Network on that row and connect to the visible Telstra network again.
+Then:
 
-### 4. Copy the names and aim the backhaul at the hidden network
+1. Open the Wi-Fi Booster card.
+2. Select **Collect main backhaul**.
+3. Allow the card to retrieve the hidden backhaul configuration.
+4. Open Wi-Fi Backhaul and locate the network listed as **Main backhaul**.
+5. Select **Connect** to establish the connection.
 
-```sh
+The collection process retrieves three important values:
+
+- **Backhaul SSID:** The hidden network name obtained from the main modem's Wi-Fi Boosters page.
+- **Backhaul password:** The password associated with the hidden backhaul radio, which is different from the visible Wi-Fi network's password.
+- **Beacon address (BSSID):** The correct wireless address identified through scanning. This is important because the MAC address displayed on the main modem's wireless configuration page belongs to a different radio.
+
+These values are saved for future connections. The password is not displayed in the card.
+
+The same information is stored by a working Telstra booster under `/root/dja-backhaul/`.
+
+This functionality has been identified on firmware `20.3.c.0389`.
+
+**Troubleshooting:** The hidden backhaul uses the main modem's 5 GHz channel. If connecting to it causes internet connectivity to drop, use Forget Network on that entry and reconnect to the visible Telstra Wi-Fi network.
+
+### 4. Mirror Wi-Fi settings and switch to the hidden backhaul
+
+If you want to mirror the main modem's Wi-Fi settings and connect to its hidden backhaul network, both features can be combined into a single command.
+
+#### One-time Wi-Fi synchronisation with hidden backhaul (`-bs`)
+
+```bash
 ./wifi-backhaul -U -bs -y
 ```
 
-`-bs` is `-b` and `-s` together. It adds the Wi-Fi Booster card, copies the visible 2.4 GHz and 5 GHz names and passwords once, follows that modem's band steering, and then points the backhaul at the hidden network. `-bS` does the same and keeps checking the names every hour. Connect to the visible Telstra network first, so it can read that network's name, password, and beacon address.
+This will:
 
-If the beacon is not in the scan yet, the switch waits. If the internet drops, Forget that network in Wi-Fi Backhaul and join the visible Telstra network again. Type that password again if the saved one was replaced.
+- Enable the Wi-Fi Booster card.
+- Copy the main modem's 2.4 GHz and 5 GHz SSIDs and passwords.
+- Match the main modem's band steering configuration.
+- Attempt to switch the wireless backhaul connection to the hidden network.
 
-### 5. Update, then run tch-gui-unhide
+#### Automatic Wi-Fi synchronisation with hidden backhaul (`-bS`)
 
-```sh
+```bash
+./wifi-backhaul -U -bS -y
+```
+
+Performs the same initial configuration but also creates an hourly scheduled task to keep the booster's Wi-Fi settings synchronised with the main modem.
+
+**Before running either command:** Connect to the visible Telstra Wi-Fi network first. This allows the script to retrieve the information required for the hidden backhaul connection.
+
+If the hidden network's beacon has not yet appeared in a scan, the switch will wait until it becomes available.
+
+If the hidden backhaul connection causes internet connectivity to drop, forget that network in the Wi-Fi Backhaul card and reconnect to the visible Telstra network. You may need to enter its password again if the saved credentials were replaced.
+
+### 5. Updating Wi-Fi Backhaul
+
+To download the latest version of Wi-Fi Backhaul, run:
+
+```bash
 curl -skLo wifi-backhaul https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul
 chmod +x wifi-backhaul
 ./wifi-backhaul -U -y
 ```
 
-Saved networks, the backhaul address, and this booster's LAN address stay as they are.
+Using `-U` preserves the existing configuration, including:
 
-```sh
+- The booster's LAN IP address.
+- Previously saved Wi-Fi networks.
+- The configured wireless backhaul IP address.
+
+#### Reapplying tch-gui-unhide
+
+If you need to reapply the Technicolor web interface modifications, run:
+
+```bash
 ./tch-gui-unhide -dy -y
 ```
 
-That rewrites the pages and puts the booster pages back. Content Sharing, Mobile, Printer Sharing, Parental Controls, and Relay Setup stay off the dashboard. The missing-card messages from those removed pages are not printed. If the tch-gui-unhide `get` command replaces `/root/tch-gui-unhide`, run `./wifi-backhaul -U -y` again.
+This rebuilds the web interface while retaining the Wi-Fi Backhaul and Wi-Fi Booster cards.
+
+Unused dashboard cards, including Content Sharing, Mobile, Printer Sharing, Parental Controls and Relay Setup, remain hidden. Messages about missing cards from removed services are also suppressed.
+
+**Important:** If updating tch-gui-unhide using its `get` installer replaces the contents of `/root/tch-gui-unhide`, run the Wi-Fi Backhaul installer again:
+
+```bash
+./wifi-backhaul -U -y
+```
+
+This restores the Wi-Fi Backhaul modifications without resetting your saved network configuration.
+
+### Command reference
+
+| Command option | Purpose |
+| --- | --- |
+| `-U` | Preserve existing network configuration when rerunning the installer |
+| `-s` | Copy the main modem's Wi-Fi settings once |
+| `-S` | Copy settings and enable hourly synchronisation |
+| `-b` | Enable the Wi-Fi Booster card |
+| `-bs` | Copy settings once and attempt hidden backhaul |
+| `-bS` | Hidden backhaul with hourly Wi-Fi synchronisation |
+| `-y` | Automatically confirm installer prompts |
 
 ## Read the hidden network on the main modem
 
@@ -422,15 +546,10 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | Option | Effect |
 | --- | --- |
 | `-i` | Not required. `pre-booster` has already set the address |
-| `-U` | Update an existing booster and keep its saved settings |
-| `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
-| `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios once, and turn band steering on here when that modem has it on. If the main modem is not connected, nothing is changed. The backhaul stays on the network already saved |
-| `-S` | Do that copy, then keep checking. The job is under Management, Scheduled Tasks, starting at once an hour. Set Hour to `*/6` to run every 6 hours. The hourly copy runs only when this command includes `-S` |
-| `-y` | Do not ask for confirmation |
 | `-n` | Accepted |
 | `-t` | Check the packaged files and exit |
 
-The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. Copy on the Access Point form does that too. `-S` keeps checking from Scheduled Tasks, and the time can be changed there. Set Hour to `*/6` for every 6 hours. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
+`-U`, `-s`, `-S`, `-b`, `-bs`, `-bS` and `-y` are listed in the command reference under How to use it.
 
 ### restore-fresh-root
 

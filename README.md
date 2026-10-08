@@ -225,7 +225,15 @@ or:
 
 `-s` copies that modem's 2.4 GHz name and password, and its 5 GHz name and password, onto this booster's own client radios. If that modem has band steering on, this booster turns band steering on and uses the same name on both bands. Guest networks are left as they are. The backhaul stays on the network already chosen. If the main modem is not connected, nothing is changed. Run `-s` again when that link is up.
 
-`-S` does that copy, then checks again every hour. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match. The job is listed under Management, Scheduled Tasks. It starts at once an hour. Change the minute, hour, day, month, or weekday there, and the next check uses that time. Deleting that task stops the hourly check.
+`-S` does that copy, then keeps checking. If the main modem's names or band steering have changed, this booster follows. Nothing is rewritten when the names already match.
+
+After `./wifi-backhaul -U -S -y`, open Management, Scheduled Tasks. The new row runs `/root/dja-backhaul/sync-upstream-ssid`. It starts once an hour. To run it every 6 hours, change that row to:
+
+| Minute | Hour | Day | Month | Weekday |
+| --- | --- | --- | --- | --- |
+| `0` | `*/6` | `*` | `*` | `*` |
+
+Leave the command as it is. That runs at 12:00am, 6:00am, 12:00pm, and 6:00pm. The next `./wifi-backhaul -U -S -y` keeps the time you set. Turn Enabled off, or delete the row, to stop the check. `./wifi-backhaul -U -y` without `-S` removes the row.
 
 The Access Point form has Mirror Main Wi-Fi SSID under Protected Management Frames. Copy does the same once-only copy as `-s`. If the main modem is not connected, nothing is changed.
 
@@ -379,6 +387,7 @@ CPU, RAM, Backhaul Download, and Backhaul Upload are shown when `./tch-gui-unhid
 The old commands are still on the booster. The USB Backup card runs them.
 
 - Schedule daily backup turns the early-morning backup on. The same button then says Turn off daily backup, which removes it. Hour and Minute set the time: 4 and 8 is 4:08am. That job saves the configuration, environment, and overlay.
+- The same job is a row under Management, Scheduled Tasks, once daily backup is on. The command is `/root/mtd-backup -d backups -ceoy`. Minute and Hour there are the backup time. Change them on this page or on the USB Backup card. Turning Enabled off, or deleting the row, turns the daily backup off.
 - Backup now writes that same backup straight away.
 - Restore and reboot writes the saved configuration back and restarts the booster. It asks before it does that.
 
@@ -416,12 +425,12 @@ After `-w`, run `./wifi-backhaul -y`. The connection drops, then the same cable 
 | `-U` | Update an existing booster and keep its saved settings |
 | `-b` | Add the Wi-Fi Booster card. A normal install leaves that card out. `./wifi-backhaul -U -y` keeps the card if `-b` was already used |
 | `-s` | Copy the upstream modem's 2.4 GHz and 5 GHz names and passwords onto this booster's client radios once, and turn band steering on here when that modem has it on. If the main modem is not connected, nothing is changed. The backhaul stays on the network already saved |
-| `-S` | Do that copy, then check again every hour. The job is under Management, Scheduled Tasks, starting at once an hour. Change the time there. The hourly copy runs only when this command includes `-S` |
+| `-S` | Do that copy, then keep checking. The job is under Management, Scheduled Tasks, starting at once an hour. Set Hour to `*/6` to run every 6 hours. The hourly copy runs only when this command includes `-S` |
 | `-y` | Do not ask for confirmation |
 | `-n` | Accepted |
 | `-t` | Check the packaged files and exit |
 
-The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. Copy on the Access Point form does that too. `-S` keeps checking every hour from Scheduled Tasks, and the time can be changed there. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
+The order for `-s`, `-S`, `-b`, and `-bs` is in How to use it above. `-s` copies the upstream 2.4 GHz and 5 GHz names and passwords once and leaves the backhaul on the visible network. Copy on the Access Point form does that too. `-S` keeps checking from Scheduled Tasks, and the time can be changed there. Set Hour to `*/6` for every 6 hours. `-b` adds the Wi-Fi Booster card, which collects the hidden network's name, password, and beacon address. `-bs` copies the names once and then aims the backhaul at that hidden network. `-bS` does that and keeps checking the names every hour. It uses the same 5 GHz channel as the visible Telstra network.
 
 ### restore-fresh-root
 

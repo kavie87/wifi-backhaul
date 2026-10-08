@@ -20505,7 +20505,9 @@ if [ -x /root/dja-backhaul/apply-link-flags ]; then
 fi
 if [ "$SYNC_HOUR" = y ]; then
   echo "Scheduled Tasks checks the 2.4 and 5 GHz names every hour."
-  echo "Change that time under Management, Scheduled Tasks."
+  echo "The command is /root/dja-backhaul/sync-upstream-ssid."
+  echo "Under Management, Scheduled Tasks, set Hour to */6 and leave Minute at 0 to run every 6 hours."
+  echo "Leave the command as it is. Turning Enabled off, or deleting the row, stops the check."
   echo "Band steering is turned on here when the main modem has it on."
   echo "If the main modem is not connected yet, the names are copied when it connects."
   echo "Copy on the Access Point form does the same copy once."

@@ -13,7 +13,10 @@ out=${1:-/tmp/dja-main-backhaul}
 # The password is on the AP section for that interface. The address the
 # radio transmits is cur_etheraddr, not the MAC shown on the wireless page.
 iface=$(uci show wireless 2>/dev/null | sed -n "s/^wireless\\.\\([^=]*\\)\\.backhaul='1'\$/\\1/p" | head -1)
-[ -n "$iface" ] || iface=wl0_1
+if [ -z "$iface" ]; then
+  echo "ERROR: No wireless interface is marked as the hidden backhaul." >&2
+  exit 1
+fi
 ssid=$(uci -q get "wireless.$iface.ssid")
 pass=
 for ap in $(uci show wireless 2>/dev/null | sed -n "s/^wireless\\.\\([^=]*\\)\\.iface='$iface'\$/\\1/p"); do
@@ -22,12 +25,15 @@ for ap in $(uci show wireless 2>/dev/null | sed -n "s/^wireless\\.\\([^=]*\\)\\.
 done
 [ -n "$pass" ] || pass=$(uci -q get "wireless.$iface.wpa_psk_key")
 bssid=$(wl -i "$iface" cur_etheraddr 2>/dev/null | grep -o -E '([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}' | head -1)
+bssid_from_radio=y
 if [ -z "$bssid" ] && [ -r "/sys/class/net/$iface/address" ]; then
   bssid=$(cat "/sys/class/net/$iface/address")
+  bssid_from_radio=n
 fi
 dotted=$(printf '%s' "$iface" | tr '_' '.')
 if [ -z "$bssid" ] && [ -r "/sys/class/net/$dotted/address" ]; then
   bssid=$(cat "/sys/class/net/$dotted/address")
+  bssid_from_radio=n
 fi
 device=$(uci -q get "wireless.$iface.device")
 channel=$(uci -q get "wireless.$device.channel")
@@ -42,7 +48,7 @@ if [ -z "$channel" ]; then
 fi
 
 if [ -z "$ssid" ] || [ -z "$pass" ] || [ -z "$bssid" ]; then
-  echo "Could not read the main modem backhaul." >&2
+  echo "ERROR: Unable to collect the hidden backhaul SSID, password, or beacon address." >&2
   exit 1
 fi
 if [ "$ssid" = "$pass" ]; then
@@ -70,12 +76,21 @@ else
   rm -f "$out/channel"
 fi
 
-echo "Backhaul name: $ssid"
-echo "Radio address: $bssid"
-if [ -s "$out/channel" ]; then
-  echo "Channel: $channel"
-else
-  echo "Channel: not a 5 GHz channel, so it was not saved."
+echo
+printf '%s\n' '========================================' ' Main Backhaul - Collection Result' '========================================'
+echo "Results:"
+printf '  Hidden backhaul SSID: %s\n' "$ssid"
+printf '  Beacon address (BSSID): %s\n' "$bssid"
+if [ "$bssid_from_radio" != y ]; then
+  echo "  Beacon address: Taken from the interface address. The radio did not report cur_etheraddr."
 fi
-echo "Files are in $out"
-echo "The password was saved and was not printed."
+if [ -s "$out/channel" ]; then
+  printf '  5 GHz channel: %s\n' "$channel"
+else
+  echo "  5 GHz channel: Not available; channel file not saved."
+fi
+printf '  Saved files: %s\n' "$out"
+echo "  Password: Saved to file; not displayed in terminal."
+echo "Next steps:"
+echo "  Copy this directory to the booster, including the password file."
+printf '  On the booster, run: ./take-main-backhaul %s\n' "$out"

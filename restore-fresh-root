@@ -117,9 +117,13 @@ if [ -n "$MOUNT" ]; then
 fi
 
 echo
-echo "This puts the booster back to a freshly rooted modem."
-echo "The Wi-Fi backhaul and the booster pages will be removed."
-echo "Root and the current SSH key are kept. The root password becomes root."
+printf '%s\n' '========================================' ' Restore Fresh Root - Confirmation' '========================================'
+echo "This removes the Wi-Fi Backhaul configuration and saved upstream network information."
+echo "Root access is kept. The modem returns to a freshly rooted configuration."
+echo "de-telstra and a clean tch-gui-unhide are applied after reboot."
+echo "This is not a USB configuration backup restore."
+echo "WARNING: The root password will be reset to root."
+echo "Change this password immediately after restoration."
 if [ -n "$IP" ]; then
   echo "LAN address after reboot: $IP"
 elif [ "$KEEP_IP" = "Y" ]; then
@@ -128,12 +132,12 @@ else
   echo "LAN address after reboot: the factory address"
 fi
 if [ -n "$USB_DIR" ]; then
-  echo "The fresh setup will be copied to the USB stick."
+  echo "Fresh setup source: the USB stick."
 else
-  echo "No USB stick is inserted."
-  echo "Plug the WAN port into the main modem so the setup can download after reboot."
+  echo "Fresh setup source: download after reboot. The WAN port needs the main modem."
 fi
-echo "After reboot, connect a computer to a LAN port. This will no longer be a bridge."
+echo "restore-fresh-root runs the factory reset itself. Do not run reset-to-factory-defaults-with-root separately."
+echo "The modem reboots. After it starts, connect a computer to a LAN port. This will no longer be a bridge."
 echo
 
 if [ "$YES" != "Y" ]; then
@@ -304,6 +308,8 @@ END_DEFAULTS
 chmod 755 "$DEFAULTS"
 sync
 echo -e "${GREEN}Factory reset is prepared. Rebooting.${NC}"
+echo "WARNING: The root password will be reset to root."
+echo "Change this password immediately after restoration."
 echo "After it comes back, the log is /root/fresh-root.log"
 if [ -e /proc/sysrq-trigger ]; then
   sleep 1

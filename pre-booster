@@ -20,6 +20,14 @@ ORANGE='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+# tch-gui-unhide -Cs shows the summary chart by setting
+# web.card_Charts.hide to 0. That value is stored in UCI and is what a
+# later tch-gui-unhide run reads. Hidden Backhaul Download and Upload
+# cards are not this setting: -Cs does not create those cards.
+chart_summary_active() {
+  [ "$(uci -q get web.card_Charts.hide)" = "0" ]
+}
+
 usage() {
 cat <<EOH
 Moves the booster modem onto the same network as the main modem.
@@ -254,30 +262,26 @@ if [ "$WIRED" = y ]; then
 fi
 
 old_lan=$(uci -q get network.lan.ipaddr)
+echo
+printf '%s\n' '========================================' ' Pre-Booster - Network Preparation' '========================================'
+echo "Current configuration:"
+printf '  LAN address: %s\n' "${old_lan:-unknown}"
+printf '  Requested LAN address: %s\n' "$LAN_IP"
 if [ "$WIRED" = y ]; then
-  echo -e "${GREEN}The main modem addressed the WAN port.${NC}"
-  echo "  WAN:  $WAN_IP"
-  echo "  LAN:  $LAN_IP"
-  echo -e "${ORANGE}The WAN cable stays connected. This session stays up.${NC}"
-  echo "Next, run ./wifi-backhaul -y"
-  echo "The connection drops, then the same cable opens http://$LAN_IP/"
-  echo "Connect the Wi-Fi backhaul there. When that link is up, unplug the cable and move this booster."
+  printf '  Wired setup: WAN %s, gateway %s\n' "$WAN_IP" "$WAN_GW"
+  echo "  The WAN port stays on the main modem. This WAN session stays up while the LAN address is saved."
 else
-  echo -e "${GREEN}This moves the modem LAN address.${NC}"
-  echo "  From: ${old_lan:-unknown}"
-  echo "  To:   $LAN_IP"
-  echo -e "${ORANGE}The network restarts. The modem stays up. DHCP stays on.${NC}"
-  echo "You may need to reconnect the LAN or WAN cables."
-  echo "Open http://$LAN_IP/ when it finishes, then run ./wifi-backhaul -y"
+  echo "  Direct setup: changing the LAN address restarts the network and may drop this SSH session."
 fi
-
+if chart_summary_active; then
+  echo "Existing summary chart configuration detected."
+  echo "Preserving existing chart visibility preferences."
+fi
 if [ "$old_lan" = "$LAN_IP" ]; then
-  echo -e "${GREEN}This modem is already at $LAN_IP.${NC}"
-  if [ "$WIRED" = y ]; then
-    echo "Run ./wifi-backhaul -y if it has not been installed yet."
-  else
-    echo "Open http://$LAN_IP/ and then run the Wi-Fi backhaul installer."
-  fi
+  echo "Results:"
+  echo "  The requested LAN address is already configured."
+  echo "Next steps:"
+  echo "  Run ./wifi-backhaul -y if it is not installed."
   exit 0
 fi
 
@@ -287,24 +291,38 @@ if [ "$YES" != y ]; then
   [ "$REPLY" = y ] || [ "$REPLY" = Y ] || exit 0
 fi
 
+echo "Applying configuration..."
 uci set network.lan.proto='static'
 uci set network.lan.ipaddr="$LAN_IP"
 uci set network.lan.netmask="$WAN_MASK"
-uci commit network
+if ! uci commit network; then
+  echo "Results:" >&2
+  echo "  The LAN address was not saved." >&2
+  exit 1
+fi
+saved_lan=$(uci -q get network.lan.ipaddr)
+if [ "$saved_lan" != "$LAN_IP" ]; then
+  echo "Results:" >&2
+  printf '  The LAN address is still %s.\n' "${saved_lan:-unknown}" >&2
+  exit 1
+fi
 
 if [ "$WIRED" = y ]; then
-  echo -e "${GREEN}LAN address $LAN_IP is saved.${NC}"
-  echo "The WAN address is still $WAN_IP. This session stays on it."
-  echo "Run: ./wifi-backhaul -y"
-  echo "When the Wi-Fi backhaul is up, unplug the cable and move this booster."
+  echo "Results:"
+  printf '  LAN address %s is saved. The WAN session stays on %s.\n' "$LAN_IP" "$WAN_IP"
+  echo "Next steps:"
+  echo "  Run ./wifi-backhaul -y"
   exit 0
 fi
 
-echo "Restarting the network. The modem stays up."
-echo "You may need to reconnect the LAN or WAN cables."
-/etc/init.d/network reload
-/etc/init.d/dnsmasq restart
-echo -e "${GREEN}LAN address is $LAN_IP.${NC}"
-echo "You may need to reconnect the LAN or WAN cables."
-echo "Open http://$LAN_IP/ and confirm the page loads."
-echo "Then run: ./wifi-backhaul -y"
+echo "Restarting the network. This SSH session may drop."
+if ! /etc/init.d/network reload; then
+  echo "Results:" >&2
+  printf '  The network restart did not finish. The saved LAN address is %s.\n' "$LAN_IP" >&2
+  exit 1
+fi
+/etc/init.d/dnsmasq restart || true
+echo "Results:"
+printf '  LAN address: %s\n' "$LAN_IP"
+echo "Next steps:"
+printf '  Open http://%s/ and confirm the page loads. Then run ./wifi-backhaul -y\n' "$LAN_IP"

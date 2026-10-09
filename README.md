@@ -133,6 +133,8 @@ The station does not currently send a DHCP hostname. The main modem can therefor
 
 **Before Wi-Fi verification:** Ethernet WAN remains active and the WAN port keeps its original function. Link detection, the DHCP lease, the gateway and the default route stay with that WAN service. WAN masquerade and the LAN DHCP server stay as well. The LAN address stays where `pre-booster` left it, unless setup asked for a different address. Restarting the backhaul service does not move the port before the Wi-Fi check passes. The station address script can still replace the DNS server list once the station has an address. That is earlier than the gateway ping.
 
+While that port is still WAN and the cable is linked, the WAN light stays on. Online is green while internet answers through Ethernet WAN. On the spare, both lights were green with WAN address `192.168.29.11`. After the port becomes a LAN port, the WAN light is turned off. Online then follows the Wi-Fi path. That later change has not been checked on the hardware yet.
+
 **Ethernet WAN and the LAN use different subnets.** The Wi-Fi upstream and the booster LAN have to share one `/24`. An Ethernet WAN on that same `/24` overlaps the LAN, so it is not a usable internet path. A WAN on another subnet can provide internet until the handover.
 
 These checks have to pass on the Wi-Fi station. A ping that can still leave through Ethernet WAN is not enough:
@@ -231,12 +233,12 @@ The `tch-gui-unhide` command above includes several options to simplify the web 
 |---|---|
 | `-hn` | Sets the browser title to the modem's hostname. |
 | `-dy` | Allows access to the web interface without a password. |
-| `-Cs` | Shows one summary chart. Wi-Fi Backhaul reads that as `web.card_Charts.hide=0`. It does not hide the CPU, RAM, Backhaul Download or Backhaul Upload cards because that value is set. |
+| `-Cs` | Shows one summary chart. Wi-Fi Backhaul reads that as `web.card_Charts.hide=0`. When that chart is already on, `pre-booster` and a fresh Wi-Fi Backhaul install keep Backhaul Download and Backhaul Upload hidden. |
 | `-tc` | Enables the classic theme. |
 | `-a5` | Displays five cards across the web interface. |
 | `-y` | Automatically confirms prompts. |
 
-If a summary chart is already in use, a later Wi-Fi Backhaul install or update leaves that chart and the individual cards as they are. A card you have shown yourself stays shown. The installer does not turn the summary chart on. If it is not in use, a fresh install shows the CPU, RAM, Backhaul Download and Backhaul Upload cards. An update with `-U` leaves every card as it already is.
+If a summary chart is already on, `pre-booster` and a fresh Wi-Fi Backhaul install keep Backhaul Download and Backhaul Upload hidden. CPU, RAM and the summary chart stay as they are. If the summary chart is not in use, a fresh install shows the CPU, RAM, Backhaul Download and Backhaul Upload cards. An update with `-U` leaves every card as it already is.
 
 **Security note:** The `-dy` option disables password protection for the web interface. Only use this on a trusted network.
 
@@ -770,9 +772,9 @@ By default, the following cards are available:
 - Backhaul Download
 - Backhaul Upload
 
-`./tch-gui-unhide -Cs` is about that summary chart. It is not a separate switch for the Backhaul Download and Backhaul Upload cards on their own.
+`./tch-gui-unhide -Cs` shows that summary chart. Run it before `pre-booster` and Wi-Fi Backhaul. Both of those then leave Backhaul Download and Backhaul Upload hidden. CPU and RAM stay as they already are.
 
-When that summary chart is already in use, installing or updating Wi-Fi Backhaul leaves the summary chart and the individual cards as they are. A card you have shown yourself stays shown. This applies to a fresh install and to an update, including `./wifi-backhaul -U -y`.
+An update with `./wifi-backhaul -U -y` does not change card visibility. A fresh install does the hiding when the summary chart is already on.
 
 When the summary chart is not in use, a fresh install shows the CPU, RAM, Backhaul Download and Backhaul Upload cards. An update with `-U` leaves every card as it already is.
 
@@ -1093,7 +1095,7 @@ Turn on **Schedule daily backup** in the USB Backup card first. The row is not a
 
 ### Dashboard cards have reappeared
 
-A summary chart is `web.card_Charts.hide=0`. Wi-Fi Backhaul does not hide the CPU, RAM, Backhaul Download or Backhaul Upload cards because that chart is on, and it does not turn the chart on. `./tch-gui-unhide -Cs` is the separate command that shows the summary chart. Detecting the chart does not prove that command was used.
+A summary chart is `web.card_Charts.hide=0`. That is what `./tch-gui-unhide -Cs` leaves behind. When it is already on, `pre-booster` and a fresh Wi-Fi Backhaul install hide Backhaul Download and Backhaul Upload. They do not turn the summary chart on, and they do not change CPU or RAM. An update does not change card visibility.
 
 If that summary chart is still the one on screen, run Wi-Fi Backhaul again. Use `-U` when the booster is already installed. The summary chart and any individual card you have left visible stay as they are. An enabled hourly Wi-Fi check stays enabled.
 

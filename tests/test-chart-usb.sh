@@ -63,12 +63,23 @@ apply_chart_visibility
 [ "$(cat "$work/uci/web_card_Charts_hide")" = 0 ] || fail "summary chart was turned off"
 pass "summary chart with hidden detail cards is preserved"
 
-# 2. Summary on, one detail card manually visible.
+# 2. Summary on, CPU visible, backhaul cards already hidden.
 reset_cards 0 0 1 1 1
 UPDATE=n
 apply_chart_visibility
-[ "$(cat "$work/uci/web_card_CPU_hide")" = 0 ] || fail "a manually visible card was hidden"
-pass "a manually visible card stays visible beside the summary chart"
+[ "$(cat "$work/uci/web_card_CPU_hide")" = 0 ] || fail "a visible CPU card was hidden"
+[ "$(cat "$work/uci/web_card_A_BackhaulDown_hide")" = 1 ] || fail "a hidden backhaul card was shown"
+pass "CPU stays visible and hidden backhaul cards stay hidden"
+
+# 2b. Summary on, backhaul cards visible. Fresh install hides them.
+reset_cards 0 0 0 0 0
+UPDATE=n
+apply_chart_visibility
+[ "$(cat "$work/uci/web_card_A_BackhaulDown_hide")" = 1 ] || fail "summary mode left Backhaul Download visible"
+[ "$(cat "$work/uci/web_card_B_BackhaulUp_hide")" = 1 ] || fail "summary mode left Backhaul Upload visible"
+[ "$(cat "$work/uci/web_card_CPU_hide")" = 0 ] || fail "summary mode hid CPU"
+[ "$(cat "$work/uci/web_card_Charts_hide")" = 0 ] || fail "summary chart was turned off"
+pass "a prior summary chart hides the separate backhaul cards"
 
 # 3. Summary off, detail cards visible. Fresh install keeps them visible.
 reset_cards 1 0 0 0 0

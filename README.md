@@ -83,11 +83,11 @@ On a fresh installation the script will:
 
 While that port is still the WAN port, the modem's own WAN service requests a DHCP address when a cable is linked. The gateway and default route come from that lease. No extra WAN command is required. Plugging the cable in after installation does the same thing until the handover has finished. The Ethernet WAN network has to be a different subnet from the booster's LAN. The Wi-Fi link to the main modem and the booster's LAN stay in one `/24`.
 
-Before the handover, the booster's DHCP server and WAN masquerade stay in place. A computer on a LAN port can use the booster as its gateway and reach the internet through Ethernet WAN. That path was confirmed on an already installed spare while Wi-Fi was stopped. It has not been repeated as a fresh `./wifi-backhaul -y` with the cable already in the WAN port.
+Before the handover, the booster's DHCP server and WAN masquerade stay in place. A computer on a LAN port can use the booster as its gateway and reach the internet through Ethernet WAN. That computer path was confirmed on an already installed spare while Wi-Fi was stopped. On 9 October 2026 a fresh `./wifi-backhaul -y`, with the WAN cable already connected and no Wi-Fi saved, left Ethernet WAN in place. The booster itself then reached the internet, and a restart of the backhaul service did not move the port.
 
 Once the Wi-Fi station has an address, its address script can replace the booster's DNS servers before the Wi-Fi check has passed. A ping to an internet address can still leave through Ethernet WAN while a name lookup uses those new servers.
 
-The Internet Access and Local Network cards read the live Ethernet route. When that route is an Ethernet port and Wi-Fi is not yet verified, the card code shows the WAN connection and its address. On the spare those files were loaded after the web server was reloaded. A screenshot of the new wording was not kept, so the on-screen result is not recorded as a separate check.
+The Internet Access and Local Network cards read the live Ethernet route. When that route is an Ethernet port and Wi-Fi is not yet verified, the cards show the WAN connection and its address. On 9 October 2026 the dashboard showed **Internet Access Available**, **WAN connected**, WAN IP `192.168.29.11` and gateway `192.168.29.1`. Local Network showed **WAN Connected**, the booster at `192.168.100.4`, and the same WAN IP and gateway.
 
 The LAN network is not restarted when that address is already in place, so the Ethernet session stays up. Enter the upstream Wi-Fi name and password afterwards in the Wi-Fi Backhaul card. Saving those details does not disable Ethernet WAN. The management session stays on the existing LAN address while the booster tries to join. If a Wi-Fi name and password are already saved, the installer starts the backhaul service and the same check can finish the handover in that run. When Wi-Fi is unavailable, the check stops and Ethernet WAN stays.
 
@@ -111,7 +111,7 @@ For example:
 
 Locate the **Wi-Fi Backhaul** card and select the wireless network you want the booster to connect to.
 
-Enter the network password and establish the connection. A management cable in a LAN port can stay connected while the booster checks Wi-Fi. Unplug a WAN cable that is on another subnet before that check finishes.
+Enter the network password and establish the connection. A management cable in a LAN port can stay connected while the booster checks Wi-Fi. Unplug a WAN cable that is on another subnet before that check finishes. The Wi-Fi Backhaul card can show a saved network as not connected for about a minute, then show it connected. Wait for that before deciding the attempt failed.
 
 The handover runs by itself only after the checks in Step 2 succeed. On this DJA0231 the physical WAN jack is `eth4`. It is not the jack labelled LAN 4. Wait until the booster answers again on its LAN address. Confirm the handover has finished before you disconnect a cable: the old WAN port is now an extra LAN port, and the booster still reaches the main modem over Wi-Fi.
 
@@ -133,7 +133,7 @@ The station does not currently send a DHCP hostname. The main modem can therefor
 
 **Before Wi-Fi verification:** Ethernet WAN remains active and the WAN port keeps its original function. Link detection, the DHCP lease, the gateway and the default route stay with that WAN service. WAN masquerade and the LAN DHCP server stay as well. The LAN address stays where `pre-booster` left it, unless setup asked for a different address. Restarting the backhaul service does not move the port before the Wi-Fi check passes. The station address script can still replace the DNS server list once the station has an address. That is earlier than the gateway ping.
 
-While that port is still WAN and the cable is linked, the WAN light stays on. Online is green while internet answers through Ethernet WAN. On the spare, both lights were green with WAN address `192.168.29.11`. After the port becomes a LAN port, the WAN light is turned off. Online then follows the Wi-Fi path. That later change has not been checked on the hardware yet.
+While that port is still WAN and the cable is linked, the WAN light stays on. Online is green while internet answers through Ethernet WAN. On the spare, both lights were green with WAN address `192.168.29.11`. After the port becomes a LAN port, the WAN light goes off and Online follows the Wi-Fi path. That was seen after the handover at 23:12: the WAN light was off and only Online was on.
 
 **Ethernet WAN and the LAN use different subnets.** The Wi-Fi upstream and the booster LAN have to share one `/24`. An Ethernet WAN on that same `/24` overlaps the LAN, so it is not a usable internet path. A WAN on another subnet can provide internet until the handover.
 
@@ -727,11 +727,11 @@ The following changes are made to the dashboard:
 
 ### Available dashboard cards
 
-- **Internet Access:** While Wi-Fi is verified, this shows the upstream Wi-Fi network, signal strength and connection rate. Before that, when the default route is an Ethernet WAN port, the card code shows **Internet Access Available**, **WAN connected**, the WAN address and the gateway. The speed figures then use that Ethernet port. Seeing that WAN wording on a dashboard was not recorded as a separate check. Backhaul download and upload statistics are shown in the corner of the card.
+- **Internet Access:** While Wi-Fi is verified, this shows the upstream Wi-Fi network, signal strength and connection rate. Before that, when the default route is an Ethernet WAN port, the card shows **Internet Access Available**, **WAN connected**, the WAN address and the gateway. That wording was seen on the spare dashboard on 9 October 2026, with WAN IP `192.168.29.11` and gateway `192.168.29.1`. The speed figures then use that Ethernet port. Backhaul download and upload statistics are shown in the corner of the card.
 - **Wi-Fi Backhaul:** Displays the active upstream connection, including its SSID, signal strength, connection rate, channel, channel width and uptime. It also allows you to scan for, connect to and manage wireless networks.
 - **Wi-Fi Booster:** An optional card for reading the upstream BH SSID, password and beacon. It is only available when the installer has been run with `-b`.
 - **Wi-Fi:** Displays the booster's local 2.4 GHz and 5 GHz wireless networks, with each band clearly separated.
-- **Local Network:** Displays the booster's LAN IP address. While Wi-Fi is verified it also shows the Wi-Fi backhaul address and gateway. Before that, when Ethernet WAN holds the default route, the card code shows **WAN Connected**, **WAN IP** and that gateway. Seeing that WAN wording on a dashboard was not recorded as a separate check.
+- **Local Network:** Displays the booster's LAN IP address. While Wi-Fi is verified it also shows the Wi-Fi backhaul address and gateway. Before that, when Ethernet WAN holds the default route, the card shows **WAN Connected**, **WAN IP** and that gateway. That wording was seen on the spare dashboard on 9 October 2026.
 - **USB Backup:** Provides access to USB configuration backups and restoration.
 - **Management:** Allows you to view, enable or disable dashboard cards. The Wi-Fi Backhaul card has its own switch, and USB Backup is labelled **USB**.
 
@@ -1041,7 +1041,7 @@ Confirm the default route points at the WAN gateway on the WAN port. A Wi-Fi def
 
 ### Internet works but the cards still say Wi-Fi is disconnected
 
-Internet Access and Local Network show Ethernet WAN when the default route is an Ethernet port and Wi-Fi is not verified. The Broadband card stays hidden and is not that display. The card files have to be the ones from this installer, and the web server has to load them. A dashboard that still shows only the Wi-Fi wording after a refresh is still on the previous card files. The new WAN wording itself has not been captured on a screenshot.
+Internet Access and Local Network show Ethernet WAN when the default route is an Ethernet port and Wi-Fi is not verified. The Broadband card stays hidden and is not that display. The card files have to be the ones from this installer, and the web server has to load them. A dashboard that still shows only the Wi-Fi wording after a refresh is still on the previous card files. The WAN wording was seen on the spare on 9 October 2026.
 
 ### Wi-Fi connects but the handover does not run
 
@@ -1104,7 +1104,7 @@ If a later `tch-gui-unhide` run turned the summary chart off, Wi-Fi Backhaul wil
 ## Compatibility and known limitations
 
 - **Hardware:** This is for a rooted Telstra DJA0231. The acknowledgements describe that as Telstra Gen 2 hardware. Other models are not covered here.
-- **Firmware:** Reading the BH SSID is identified on `20.3.c.0389`. The Ethernet WAN checks in this README were made on an already installed spare running `20.3.c.0501-MR22.1-RA`. A fresh install with the WAN cable already connected was not part of that check. Do not treat every firmware release as supported.
+- **Firmware:** Reading the BH SSID is identified on `20.3.c.0389`. The Ethernet WAN checks were made on a spare running `20.3.c.0501-MR22.1-RA`. On 9 October 2026 a fresh `./wifi-backhaul -y` with the WAN cable already connected left Ethernet WAN in place, the booster reached the internet, a service restart did not move the port, and connecting Wi-Fi then converted `eth4` once. Do not treat every firmware release as supported.
 - **Root:** The modem must already be rooted. A factory reset is only safe when you know that firmware keeps root. `restore-fresh-root` returns a clean rooted configuration and still leaves the modem rooted. It is not stock Telstra firmware.
 - **BH backhaul mode:** Optional and experimental. `-b` adds the Wi-Fi Booster card so the booster can use the upstream BH SSID instead of a normal 5 GHz SSID. Joining is a separate step, or an attempt started by `-bs` or `-bS`. Initial testing suggests a Telstra Smart Modem Gen 3 can work as the upstream router. Other upstream devices are not confirmed. See [Enable the Wi-Fi Booster card](#3-enable-the-wi-fi-booster-card).
 - **Local Wi-Fi:** Independent of the upstream link unless you use `-s` or `-S`.

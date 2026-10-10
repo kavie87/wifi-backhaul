@@ -359,7 +359,7 @@ After `-S`, open **Management → Scheduled Tasks**. The new task checks the mai
 0 * * * * /root/dja-backhaul/sync-upstream-ssid
 ```
 
-The main modem must be connected and reachable. The check looks at its 2.4 GHz and 5 GHz names, passwords and band steering. The booster is updated only when something there has changed. If nothing has changed, the local Wi-Fi is left as it is. The task checks at the selected interval. It does not change the SSID or password every time it runs.
+The main modem must be connected and reachable. The check reads that modem's 2.4 GHz and 5 GHz names. When those names already match the booster, the check stops. The radio is left alone and the upstream connection stays up. Running `./wifi-backhaul -S` again on a booster that is already connected does the same check. The booster is updated only when a name has changed. That update copies the names and passwords, then the shared 5 GHz radio reloads and the upstream connection reconnects on its own. The task checks at the selected interval. It does not change the SSID or password every time it runs.
 
 Change the schedule in **Management → Scheduled Tasks**. You do not need to run `./wifi-backhaul -S` again just to change the time. Change only the five timing fields. Leave the command as:
 
@@ -421,7 +421,7 @@ This performs the same one-time synchronisation as `-s`.
 **Important notes:**
 
 - The wireless backhaul must already be connected to the main modem before copying settings.
-- The booster's 5 GHz radio must operate on the same channel as the main modem because it is also used for the wireless backhaul.
+- The booster's 5 GHz radio uses the same channel as the main modem, because the local 5 GHz network and the upstream station share that radio. While the station is associated, the script does not move that radio. It updates the saved channel only when the radio is already on the station's channel.
 - The 2.4 GHz radio can operate on a different channel.
 - SSIDs are copied exactly as configured on the main modem, without adding a suffix or additional characters.
 
@@ -910,7 +910,7 @@ Standard installation:
 - **Wi-Fi synchronisation:** The `-s` and `-S` options require an active connection to the main modem. If no connection is available, the Wi-Fi settings remain unchanged.
 - **Scheduled synchronisation:** The task created by `-S` can be viewed and adjusted under **Management → Scheduled Tasks**. It is not listed until `-S` has been run. A later `./wifi-backhaul` or `./wifi-backhaul -U` keeps an enabled task, a custom timing, and a task that is switched off. It does not put a deleted task back. `./wifi-backhaul -Sr` removes only that task and leaves the current Wi-Fi name unchanged.
 - **BH backhaul mode:** The `-b` option enables the Wi-Fi Booster card so it can read the BH SSID, password and beacon address from the upstream router. Joining that SSID is a later step.
-- **Wireless channel:** The booster's 5 GHz backhaul uses the same channel as the main modem.
+- **Wireless channel:** While the station is associated, the 5 GHz radio is left on the channel it is using. The saved channel is updated only when the radio is already on that channel.
 
 For detailed instructions and examples of each configuration option, refer to the **How to use it** section above.
 
@@ -1063,9 +1063,17 @@ That is the finished handover. `eth4` is in the LAN bridge, the WAN protocol is 
 
 In the Wi-Fi Backhaul card, check the upstream name and type the Wi-Fi password from the main modem. The network name is not the password.
 
-The same card shows signal strength after a scan. The booster's 5 GHz backhaul uses the same channel as the main modem.
+The same card shows signal strength after a scan. While the station is associated, the 5 GHz radio is left on the channel it is using.
 
 Connecting saves a lock to the radio (BSSID) that was joined. That lock can stop the booster joining a different access point that uses the same name. Disconnect clears the active lock. Connecting to another network replaces it. Forget Network removes the saved network.
+
+### The upstream connection drops after it has connected
+
+The 5 GHz radio is shared by the local network and the upstream station. Reloading it, or moving it to a channel the main modem is no longer using, drops that station.
+
+On 10 October 2026 the spare was associated to the main modem on channel 48 while a channel saved the night before was still 104. Moving the radio back to 104 stopped the gateway answering, and the connection was restarted. The script now keeps the channel the station is using. It updates the saved channel only when the radio is already on that channel, and it does not move the radio while the station is associated. A missed answer from the gateway does not restart the radio during that association. The radio is restarted when the station has dropped, or when the gateway has stayed silent for five minutes.
+
+`./wifi-backhaul -S` on an already connected booster, and the hourly name check, leave that radio alone when the 2.4 GHz and 5 GHz names already match. When a name has changed, the radio reloads and the upstream connection is started again.
 
 ### Automatic SSID synchronisation is not working
 
@@ -1104,7 +1112,7 @@ If a later `tch-gui-unhide` run turned the summary chart off, Wi-Fi Backhaul wil
 ## Compatibility and known limitations
 
 - **Hardware:** This is for a rooted Telstra DJA0231. The acknowledgements describe that as Telstra Gen 2 hardware. Other models are not covered here.
-- **Firmware:** Reading the BH SSID is identified on `20.3.c.0389`. The Ethernet WAN checks were made on a spare running `20.3.c.0501-MR22.1-RA`. On 9 October 2026 a fresh `./wifi-backhaul -y` with the WAN cable already connected left Ethernet WAN in place, the booster reached the internet, a service restart did not move the port, and connecting Wi-Fi then converted `eth4` once. Do not treat every firmware release as supported.
+- **Firmware:** Reading the BH SSID is identified on `20.3.c.0389`. The Ethernet WAN checks were made on a spare running `20.3.c.0501-MR22.1-RA`. On 9 October 2026 a fresh `./wifi-backhaul -y` with the WAN cable already connected left Ethernet WAN in place, the booster reached the internet, a service restart did not move the port, and connecting Wi-Fi then converted `eth4` once. On 10 October 2026 that spare's upstream link stayed up on channel 48 after a saved channel of 104 was no longer forced. Do not treat every firmware release as supported.
 - **Root:** The modem must already be rooted. A factory reset is only safe when you know that firmware keeps root. `restore-fresh-root` returns a clean rooted configuration and still leaves the modem rooted. It is not stock Telstra firmware.
 - **BH backhaul mode:** Optional and experimental. `-b` adds the Wi-Fi Booster card so the booster can use the upstream BH SSID instead of a normal 5 GHz SSID. Joining is a separate step, or an attempt started by `-bs` or `-bS`. Initial testing suggests a Telstra Smart Modem Gen 3 can work as the upstream router. Other upstream devices are not confirmed. See [Enable the Wi-Fi Booster card](#3-enable-the-wi-fi-booster-card).
 - **Local Wi-Fi:** Independent of the upstream link unless you use `-s` or `-S`.

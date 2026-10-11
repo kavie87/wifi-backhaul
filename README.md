@@ -283,7 +283,7 @@ Connect and wait for the wireless backhaul to establish a connection.
 
 #### Managing saved networks
 
-Once connected, Wi-Fi Backhaul remembers the network name and password, making it easier to reconnect later.
+Once connected, Wi-Fi Backhaul remembers the network name and password, making it easier to reconnect later. Each name is saved once. Hearing that name on another channel does not create a second saved network. When the connection is working on a new channel, that channel replaces the saved one.
 
 - **Reconnect:** Reconnects using the previously saved password.
 - **Disconnect:** Disconnects from the current network without deleting its saved details.
@@ -744,20 +744,18 @@ The **Wi-Fi Backhaul** card provides two sections: **Current Backhaul** and **Av
 - **Disconnect:** Disconnects from the current network while retaining its saved credentials.
 - **Forget Network:** Disconnects and removes the saved network and password.
 
-**Available Networks** displays networks discovered during scanning, including those previously connected to.
+**Available Networks** displays networks discovered during scanning, including those previously connected to. The same name is listed once. A scan that hears it on more than one channel does not add a saved network for each channel.
 
 Saved networks are marked **Saved** and provide the following options:
 
 - **Reconnect:** Reconnects using the stored password.
 - **Forget Network:** Removes the saved network and its credentials.
 
-When connecting to a network, the booster also saves a lock to the wireless radio (BSSID) it joined.
+When the connection is working, the booster saves that channel and the radio it joined. The network name is saved once. If the same name later works on another channel, the saved channel and radio are replaced. The previous channel is not kept as another network.
 
-- Disconnecting removes the active radio lock.
-- Connecting to a different network replaces the previous lock with the newly connected radio.
-- Reconnecting updates the saved radio lock to match the connection.
-
-This helps the booster reconnect to the intended wireless access point.
+- Disconnecting leaves the saved network in place and clears the active radio lock.
+- Connecting to a different name replaces the active radio lock.
+- A channel change on the same name replaces the saved channel.
 
 **Important:** When connecting to a network, enter the Wi-Fi password configured on the main modem. The network name (SSID) cannot be used as the password.
 
@@ -810,12 +808,18 @@ The original backup and restore commands remain available through SSH, with the 
 
 ### Available options
 
-- **Schedule daily backup:** Enables an automatic backup of the configuration, environment and overlay. **Important:** This must be turned on before a backup task appears under **Management → Scheduled Tasks**. The task is not created by installing Wi-Fi Backhaul. Once enabled, the button changes to **Turn off daily backup**, which removes the task. Turning Enabled off, or deleting the row, also turns the backup off.
-- **Hour and Minute:** Sets one time of day for that backup. For example, Hour `4` and Minute `8` is 4:08 AM. A leading zero, such as minute `08`, is stored as `8`. Saving a time does not turn a switched-off backup back on, and it does not replace a schedule that is not a single time of day.
+- **Schedule daily backup:** Turns on the backup task. `./wifi-backhaul` lists that task under **Management → Scheduled Tasks** immediately, switched off, so it does not run until this button is used. **Turn off daily backup** switches the task off and leaves the row there. Deleting the row also turns the backup off. The next `./wifi-backhaul` run puts a switched-off row back only when no backup row is present.
+- **Hour and Minute:** Sets one time of day for that backup. For example, Hour `4` and Minute `8` is 4:08 AM. A leading zero, such as minute `08`, is stored as `8`. Saving a time does not turn a switched-off backup back on, and it does not replace a schedule that is not a single time of day. The same time can be changed under **Management → Scheduled Tasks**.
 - **Backup now:** Immediately creates a backup using the same process as the scheduled task.
 - **Restore and reboot:** Restores the saved configuration and restarts the booster. A confirmation prompt is displayed before proceeding.
 
-The installer does not choose the first clock time. Turning on **Schedule daily backup** runs `/root/mtd-backup -Cy`, which creates the task. Until a numeric time is saved, the Hour and Minute boxes show `4` and `0`. That is only the empty form.
+The installer does not choose a running time. It adds this switched-off row when Scheduled Tasks has no USB backup row:
+
+```bash
+#0 4 * * * /root/mtd-backup -d backups -ceoy
+```
+
+Hour `4` and minute `0` are only that starting row. Turning the task on, or saving Hour and Minute while it is on, uses the time you set. An existing row is left unchanged, including a switched-off row and a schedule that is not a single time of day. `./wifi-backhaul -U` does not rewrite it.
 
 Saving Hour and Minute writes this command when the card has to add the row:
 
@@ -823,7 +827,7 @@ Saving Hour and Minute writes this command when the card has to add the row:
 /root/mtd-backup -d backups -ceoy
 ```
 
-After the task exists, change a single daily time from the USB Backup card or from **Management → Scheduled Tasks**. Leave that command unchanged. `./wifi-backhaul -U` does not rewrite this task, so a time you selected is kept. If the row uses an advanced timing, such as every 30 minutes, or the row is switched off, saving Hour and Minute on the card leaves that row unchanged. Change an advanced timing under **Management → Scheduled Tasks**.
+After the task exists, change a single daily time from the USB Backup card or from **Management → Scheduled Tasks**. Leave that command unchanged. If the row uses an advanced timing, such as every 30 minutes, or the row is switched off, saving Hour and Minute on the card leaves that row unchanged. Change an advanced timing under **Management → Scheduled Tasks**.
 
 **Important:** A USB storage device must be connected before using the backup or restore functions. The card displays whether a USB device is detected.
 
@@ -1065,7 +1069,7 @@ In the Wi-Fi Backhaul card, check the upstream name and type the Wi-Fi password 
 
 The same card shows signal strength after a scan. While the station is associated, the 5 GHz radio is left on the channel it is using.
 
-Connecting saves a lock to the radio (BSSID) that was joined. That lock can stop the booster joining a different access point that uses the same name. Disconnect clears the active lock. Connecting to another network replaces it. Forget Network removes the saved network.
+Connecting saves the network name once, with the channel and radio the connection is using. If that name later works on another channel, the saved channel is replaced. The previous channel is not kept as a second network. Disconnect clears the active radio lock. Forget Network removes the saved network.
 
 ### The upstream connection drops after it has connected
 

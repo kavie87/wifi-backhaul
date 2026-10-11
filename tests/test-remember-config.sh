@@ -339,5 +339,23 @@ printf '%s' 'local-secret' | cmp -s - "$work/uci/wireless_ap0_wpa_psk_key" || fa
 printf '%s' 'kept-secret' | cmp -s - "$base/password" || fail "upstream password changed with the booster SSID"
 pass "changing the booster SSID keeps both passwords"
 
+printf '%s\n' '0 * * * * /usr/bin/other' > "$cron"
+ensure_usb_backup_task
+grep -q '^#0 4 \* \* \* /root/mtd-backup -d backups -ceoy$' "$cron" || fail "missing backup row was not added"
+grep -q '^0 \* \* \* \* /usr/bin/other$' "$cron" || fail "other cron was dropped"
+kept=$(cat "$cron")
+ensure_usb_backup_task
+printf '%s\n' "$kept" | cmp -s - "$cron" || fail "second run changed the backup row"
+printf '%s\n' '*/30 * * * * /root/mtd-backup -d backups -ceoy' > "$cron"
+ensure_usb_backup_task
+grep -q '^\*/30 \* \* \* \* /root/mtd-backup -d backups -ceoy$' "$cron" || fail "advanced backup row was replaced"
+printf '%s\n' '#8 3 * * * /root/mtd-backup -d backups -ceoy' > "$cron"
+ensure_usb_backup_task
+grep -q '^#8 3 \* \* \* /root/mtd-backup -d backups -ceoy$' "$cron" || fail "disabled backup row was re-enabled"
+printf '%s\n' '15 6 * * * /root/mtd-backup -d backups -ceoy' > "$cron"
+ensure_usb_backup_task
+grep -q '^15 6 \* \* \* /root/mtd-backup -d backups -ceoy$' "$cron" || fail "chosen backup time was rewritten"
+pass "USB backup is listed once and an existing row is kept"
+
 rm -rf "$work"
 echo "All remembered-configuration checks passed."

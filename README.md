@@ -144,7 +144,7 @@ Your rooted Telstra DJA0231 should now be operating as a wireless booster, using
 
 Ethernet WAN stays up while the upstream Wi-Fi network is being chosen and checked. Saving a Wi-Fi name and password does not, by itself, disable the WAN port or the booster's DHCP server. A leftover `/root/dja-backhaul/waiting-netmask` file from an older install is ignored. An update does not apply that old temporary subnet.
 
-The booster's own upstream address and downstream client addressing are separate. Automatic (DHCP) or Static IP on the Wi-Fi Backhaul card is the address of this booster's 5 GHz station. Downstream clients are addressed by `relayd`. The packaged downstream mode is `relay-experimental`, which forwards their DHCP requests to the upstream modem. Writing `static` into `/root/dja-backhaul/client-addressing` leaves that forwarding off and keeps the booster's own DHCP server. An update does not change a mode that is already saved. The station is not added to the LAN bridge. The management address and the upstream network have to be in the same `/24`. A different mask is rejected.
+The booster's own upstream address and downstream client addressing are separate. Automatic (DHCP) or Static IP on the Wi-Fi Backhaul card is the address of this booster's 5 GHz station. Downstream clients are addressed by `relayd`. The packaged downstream mode is `relay-experimental`, which forwards their DHCP requests to the upstream modem. A computer that still has this booster as its gateway from an earlier lease can reach the internet as soon as the Wi-Fi link is up. Its traffic is translated out of the station. A computer that later renews and uses the main modem as its gateway is forwarded as usual. Writing `static` into `/root/dja-backhaul/client-addressing` leaves that forwarding off and keeps the booster's own DHCP server. An update does not change a mode that is already saved. The station is not added to the LAN bridge. The management address and the upstream network have to be in the same `/24`. A different mask is rejected.
 
 The station does not currently send a DHCP hostname. The main modem can therefore list it as `Unknown-` followed by the station MAC. Setting the booster's system hostname does not, by itself, change that label. Downstream devices keep their own MAC addresses on the booster LAN. The upstream Wi-Fi list shows the station, because this is a three-address client with a pseudo-bridge, not a transparent bridge.
 
@@ -288,7 +288,7 @@ Refresh your browser after making changes.
 
 Open the Wi-Fi Backhaul card in the booster's web interface.
 
-Click **Scan** to discover available wireless networks.
+Click **Scan** once to discover available wireless networks. The card starts a new search and waits for that result before it shows the list.
 
 Select your main modem's visible Wi-Fi network (for example, `Telstra1B279D`).
 

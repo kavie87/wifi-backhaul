@@ -18,13 +18,30 @@ If you're new to rooting or modifying these devices, I strongly encourage you to
 
 ## Download and install
 
-Before installing Wi-Fi Backhaul, you must run `pre-booster`. This prepares the rooted Telstra DJA0231 by assigning it an IP address on the same network as your main modem.
+Before installing Wi-Fi Backhaul, the booster has to be rooted. Install the Technicolor web changes, then run `pre-booster`. That assigns the booster an IP address on the same network as your main modem.
 
 **Important:** Make sure the IP address you choose is not already being used by another device.
 
 For example, if your main modem uses `192.168.100.1`, you could assign the booster `192.168.100.4`, provided that address is available.
 
-### Step 1: Prepare the booster
+### Step 1: Install the Technicolor web changes
+
+Once the booster is rooted, download and run the `tch-gui-unhide` installer developed by [seud0nym](https://github.com/seud0nym/tch-gui-unhide):
+
+```bash
+curl -skL https://raw.githubusercontent.com/seud0nym/tch-gui-unhide/master/get | sh
+```
+
+Once installed, run:
+
+```bash
+./de-telstra -A -y
+./tch-gui-unhide -hn -dy -Cs -tc -a5 -y
+```
+
+These commands remove unnecessary Telstra-specific settings and configure the web interface for use with Wi-Fi Backhaul.
+
+### Step 2: Prepare the booster
 
 There are two ways to configure the booster's network address.
 
@@ -60,7 +77,7 @@ Confirm that the web interface loads before proceeding.
 
 For more information about `-i`, `-w` and `-y`, refer to the **Installer options** section below.
 
-### Step 2: Install Wi-Fi Backhaul
+### Step 3: Install Wi-Fi Backhaul
 
 Once `pre-booster` has completed successfully, download and run the main Wi-Fi Backhaul installer.
 
@@ -101,7 +118,7 @@ If the port change starts and the final checks fail, the previous WAN, DHCP and 
 
 A booster whose WAN port is already a LAN port is detected and left that way. The conversion is not repeated, and a later Wi-Fi outage does not move the port back.
 
-### Step 3: Connect the Wi-Fi backhaul
+### Step 4: Connect the Wi-Fi backhaul
 
 After installation, open the booster's web interface using the IP address configured earlier. A management cable in a LAN port can stay connected while you do this.
 
@@ -113,7 +130,7 @@ Locate the **Wi-Fi Backhaul** card and select the wireless network you want the 
 
 Enter the network password and establish the connection. A management cable in a LAN port can stay connected while the booster checks Wi-Fi. Unplug a WAN cable that is on another subnet before that check finishes. The Wi-Fi Backhaul card can show a saved network as not connected for about a minute, then show it connected. Wait for that before deciding the attempt failed.
 
-The handover runs by itself only after the checks in Step 2 succeed. On this DJA0231 the physical WAN jack is `eth4`. It is not the jack labelled LAN 4. Wait until the booster answers again on its LAN address. Confirm the handover has finished before you disconnect a cable: the old WAN port is now an extra LAN port, and the booster still reaches the main modem over Wi-Fi.
+The handover runs by itself only after the checks in Step 3 succeed. On this DJA0231 the physical WAN jack is `eth4`. It is not the jack labelled LAN 4. Wait until the booster answers again on its LAN address. Confirm the handover has finished before you disconnect a cable: the old WAN port is now an extra LAN port, and the booster still reaches the main modem over Wi-Fi.
 
 A cable on a different subnet from the booster LAN has to come out before that check passes. The jack joins the LAN as soon as Wi-Fi is verified, and that cable would then be attached to the booster LAN. A management cable can stay in a LAN port. Then:
 

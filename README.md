@@ -633,7 +633,7 @@ You do not need to manually enter the BH SSID password.
 
 ## Update an existing booster
 
-Use this on a booster that already has Wi-Fi Backhaul. `-U` keeps the saved setup, including the LAN address and subnet. A fresh install does not replace that subnet with a smaller one. The update itself does not move a WAN port. If a Wi-Fi name and password are already saved, the service starts and the same Wi-Fi check can finish the handover in that run. When Wi-Fi is unavailable, the port stays WAN. A handover that has already finished is not repeated.
+Use this on a booster that already has Wi-Fi Backhaul. `-U` keeps the saved setup, including the LAN address and subnet. `-u` is the same update. A fresh install does not replace that subnet with a smaller one. The update itself does not move a WAN port. If a Wi-Fi name and password are already saved, the service starts and the same Wi-Fi check can finish the handover in that run. When Wi-Fi is unavailable, the port stays WAN. A handover that has already finished is not repeated.
 
 ### Download and apply
 
@@ -643,7 +643,7 @@ If the installer is already on the booster, this downloads the current copy from
 ./wifi-backhaul -U -y
 ```
 
-`/root/wifi-backhaul -U -y` does the same thing.
+`./wifi-backhaul -u -y` is the same update. `/root/wifi-backhaul -U -y` and `/root/wifi-backhaul -u -y` do the same thing.
 
 The download address is `https://raw.githubusercontent.com/kavie87/wifi-backhaul/main/wifi-backhaul`. When that file differs from the copy you started, the downloaded copy continues the update and keeps the same options, including `-y`, `-S`, `-s`, `-b` and `-i` if you passed them. When the download matches the copy you started, it prints `This installer is already the latest.` and continues. When the download fails, it prints `Could not download a newer installer. Applying this copy.` and continues with the copy you started. `-U` does not only apply the local file, and it cannot fetch a newer copy when GitHub cannot be reached.
 

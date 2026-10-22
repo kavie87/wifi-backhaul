@@ -9,8 +9,9 @@
 # The upstream Wi-Fi name and password are not stored in this file.
 # After it finishes, choose the upstream network in the Wi-Fi Backhaul card.
 # ./tch-gui-unhide -U -y keeps these pages. Run ./wifi-backhaul -U -y
-# to apply a newer copy of this installer without changing the saved
-# upstream Wi-Fi, backhaul address, or this booster's LAN address.
+# or ./wifi-backhaul -u -y to apply a newer copy of this installer
+# without changing the saved upstream Wi-Fi, backhaul address, or this
+# booster's LAN address. -u and -U are the same update.
 # Run the full install again if you replace /root/tch-gui-unhide itself.
 
 SCRIPT="$(basename "$0")"
@@ -29,13 +30,15 @@ Usage: ./$SCRIPT [-y]
        ./$SCRIPT -S [-y]
        ./$SCRIPT -Sr [-y]
        ./$SCRIPT -U [-y]
+       ./$SCRIPT -u [-y]
        ./$SCRIPT -U -S [-y]
        ./$SCRIPT -bs [-y]
        ./$SCRIPT -U [-b] [-s] [-S] [-y]
 
 Options:
- -U           Update an existing booster and keep its saved settings,
+ -U, -u       Update an existing booster and keep its saved settings,
               including an hourly Wi-Fi check that is already enabled.
+              -u and -U are the same update.
               Run -Sr on its own to remove that check.
  -b           Add the Wi-Fi Booster card. A later run keeps the card
               if it is already enabled
@@ -54,6 +57,7 @@ Example:
   ./$SCRIPT -Sr
   ./$SCRIPT -bs -y
   ./$SCRIPT -U -y
+  ./$SCRIPT -u -y
 
 -s copies the modem this booster is connected to, once. Its 2.4 GHz and
 5 GHz client names and passwords become this booster's client names and
@@ -77,7 +81,7 @@ is verified. It also turns off unused services, including WPS
 and UPnP, and removes them from the cards. The only de-telstra command
 still needed is the hostname and domain name.
 
--U downloads the latest installer, then applies it. The upstream Wi-Fi,
+-U and -u download the latest installer, then apply it. The upstream Wi-Fi,
 the backhaul address, and this booster's LAN address stay as they are.
 Refresh the browser when it finishes.
 
@@ -248,13 +252,13 @@ parse_wifi_args() {
     set -- "$@" "$_arg"
   done < "$_args_file"
   rm -f "$_args_file"
-  while getopts :i:nytUbsS option; do
+  while getopts :i:nytuUbsS option; do
     case "$option" in
       i) LAN_IP=$OPTARG ;;
       n) REBOOT=n ;;
       y) YES=y ;;
       t) TEST=y ;;
-      U) UPDATE=y ;;
+      u|U) UPDATE=y ;;
       b) BOOSTER_CARD=y ;;
       s) SYNC_ONCE=y ;;
       S) SYNC_HOUR=y ;;

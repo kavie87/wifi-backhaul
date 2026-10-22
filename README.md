@@ -438,7 +438,7 @@ This performs the same one-time synchronisation as `-s`.
 **Important notes:**
 
 - The wireless backhaul must already be connected to the main modem before copying settings.
-- The booster's 5 GHz radio uses the same channel as the main modem, because the local 5 GHz network and the upstream station share that radio. While the station is associated, the script does not move that radio. It updates the saved channel only when the radio is already on the station's channel.
+- The booster's 5 GHz radio uses the same channel as the main modem, because the local 5 GHz network and the upstream station share that radio. While the station is associated, the script does not move that radio. It updates the saved channel only when the radio is already on the station's channel. If the connection still says it is up but that channel no longer matches, the station reconnects on the next two checks.
 - The 2.4 GHz radio can operate on a different channel.
 - SSIDs are copied exactly as configured on the main modem, without adding a suffix or additional characters.
 
@@ -1092,7 +1092,7 @@ Connecting saves the network name once, with the channel and radio the connectio
 
 The 5 GHz radio is shared by the local network and the upstream station. Reloading it, or moving it to a channel the main modem is no longer using, drops that station.
 
-On 10 October 2026 the spare was associated to the main modem on channel 48 while a channel saved the night before was still 104. Moving the radio back to 104 stopped the gateway answering, and the connection was restarted. The script now keeps the channel the station is using. It updates the saved channel only when the radio is already on that channel, and it does not move the radio while the station is associated. A missed answer from the gateway does not restart the radio during that association. The radio is restarted when the station has dropped, or when the gateway has stayed silent for five minutes.
+On 10 October 2026 the spare was associated to the main modem on channel 48 while a channel saved the night before was still 104. Moving the radio back to 104 stopped the gateway answering, and the connection was restarted. The script now keeps the channel the station is using. It updates the saved channel only when the radio is already on that channel, and it does not move the radio while the station is associated. Each connection check also compares that channel with the radio. Two checks in a row that disagree reconnect the station, instead of waiting out a silent gateway. A missed answer from the gateway does not restart the radio while the channel still matches. The radio is restarted when the station has dropped, when the channel no longer matches, or when the gateway has stayed silent for five minutes.
 
 `./wifi-backhaul -S` on an already connected booster, and the hourly name check, leave that radio alone when the 2.4 GHz and 5 GHz names already match. When a name has changed, the radio reloads and the upstream connection is started again.
 

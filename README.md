@@ -438,7 +438,7 @@ This performs the same one-time synchronisation as `-s`.
 **Important notes:**
 
 - The wireless backhaul must already be connected to the main modem before copying settings.
-- The booster's 5 GHz radio uses the same channel as the main modem, because the local 5 GHz network and the upstream station share that radio. While the station is associated, the script does not move that radio. It updates the saved channel only when the radio is already on the station's channel. If the connection still says it is up but that channel no longer matches, the station reconnects on the next two checks.
+- The booster's 5 GHz radio uses the same channel as the main modem, because the local 5 GHz network and the upstream station share that radio. While the station is associated, the script does not move that radio. A reconnect joins again on the channel the radio is already using, without a full-band scan and without restarting the local wireless service. The station interface is put into station mode, and its radio is kept awake, before the join. It scans the rest of the band only when that join fails or the radio is already on a different channel, and then it follows the beacon. The saved channel changes only after the gateway answers.
 - The 2.4 GHz radio can operate on a different channel.
 - SSIDs are copied exactly as configured on the main modem, without adding a suffix or additional characters.
 
@@ -931,7 +931,7 @@ Standard installation:
 - **Wi-Fi synchronisation:** The `-s` and `-S` options require an active connection to the main modem. If no connection is available, the Wi-Fi settings remain unchanged.
 - **Scheduled synchronisation:** The task created by `-S` can be viewed and adjusted under **Management → Scheduled Tasks**. It is not listed until `-S` has been run. A later `./wifi-backhaul` or `./wifi-backhaul -U` keeps an enabled task, a custom timing, and a task that is switched off. It does not put a deleted task back. `./wifi-backhaul -Sr` removes only that task and leaves the current Wi-Fi name unchanged.
 - **BH backhaul mode:** The `-b` option enables the Wi-Fi Booster card so it can read the BH SSID, password and beacon address from the upstream router. Joining that SSID is a later step.
-- **Wireless channel:** While the station is associated, the 5 GHz radio is left on the channel it is using. The saved channel is updated only when the radio is already on that channel.
+- **Wireless channel:** While the station is associated, the 5 GHz radio is left on the channel it is using. A reconnect follows the upstream beacon. The saved channel changes only after the gateway answers.
 
 For detailed instructions and examples of each configuration option, refer to the **How to use it** section above.
 
@@ -1092,7 +1092,7 @@ Connecting saves the network name once, with the channel and radio the connectio
 
 The 5 GHz radio is shared by the local network and the upstream station. Reloading it, or moving it to a channel the main modem is no longer using, drops that station.
 
-On 10 October 2026 the spare was associated to the main modem on channel 48 while a channel saved the night before was still 104. Moving the radio back to 104 stopped the gateway answering, and the connection was restarted. The script now keeps the channel the station is using. It updates the saved channel only when the radio is already on that channel, and it does not move the radio while the station is associated. Each connection check also compares that channel with the radio. Two checks in a row that disagree reconnect the station, instead of waiting out a silent gateway. A missed answer from the gateway does not restart the radio while the channel still matches. The radio is restarted when the station has dropped, when the channel no longer matches, or when the gateway has stayed silent for five minutes.
+On 10 October 2026 the spare was associated to the main modem on channel 48 while a channel saved the night before was still 104. Moving the radio back to 104 stopped the gateway answering, and the connection was restarted. The script does not move the radio while the station is associated. Each connection check compares the station with the radio. Two checks in a row that disagree reconnect the station, about 20 seconds, instead of waiting out a silent gateway. A reconnect joins again on the current channel, with the station interface kept in station mode and its radio kept awake. It scans the band only when that join fails or the radio is already on a different channel, and then it follows the upstream beacon. The saved channel changes only after the gateway answers. A missed answer from the gateway does not restart the radio while the channel still matches. The radio is restarted when the station has dropped, when the channel no longer matches, or when the gateway has stayed silent for five minutes.
 
 `./wifi-backhaul -S` on an already connected booster, and the hourly name check, leave that radio alone when the 2.4 GHz and 5 GHz names already match. When a name has changed, the radio reloads and the upstream connection is started again.
 
